@@ -84,45 +84,50 @@ html, body {
     filter: drop-shadow(0 10px 28px rgba(242,180,80,0.14)); /* softened */
 }
 
-.topbar-ring path.base {
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 3.5;
-    fill: none;
-    stroke: url(#topbarGrad);
-    stroke-opacity: 1;
-    filter: blur(0.6px) drop-shadow(0 6px 20px rgba(242,180,80,0.09)); /* softened */
-    /* dash pattern: short visible head + long gap to create a single moving laser head */
-    stroke-dasharray: 300 2200;
-    stroke-dashoffset: 0;
-    animation: laser-move 6.5s linear infinite;
-}
+    .topbar-ring path.base {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 3.5;
+        fill: none;
+        stroke: url(#topbarGrad);
+        stroke-opacity: 1;
+        filter: blur(0.6px) drop-shadow(0 6px 20px rgba(242,180,80,0.09)); /* softened */
+        /* dash pattern: short visible head + long gap to create a single moving laser head */
+        stroke-dasharray: 300 2200;
+        stroke-dashoffset: 0;
+        animation: laser-move 6.5s linear infinite;
+    }
 
-/* brighter, softened glowing head that fades toward the tail */
-.topbar-ring path.head {
-    stroke-linecap: round;
-    stroke-linejoin: round;
-    stroke-width: 8;
-    fill: none;
-    stroke: url(#laserHead);
-    stroke-opacity: 0.95;
-    filter: blur(4px) drop-shadow(0 12px 30px rgba(242,180,80,0.22));
-    stroke-dasharray: 300 2200;
-    stroke-dashoffset: 0;
-    animation: laser-move 6.5s linear infinite;
-}
+    /* brighter, softened glowing head that fades toward the tail */
+    .topbar-ring path.head {
+        stroke-linecap: round;
+        stroke-linejoin: round;
+        stroke-width: 8;
+        fill: none;
+        stroke: url(#laserHead);
+        stroke-opacity: 0.95;
+        filter: blur(4px) drop-shadow(0 12px 30px rgba(242,180,80,0.22));
+        stroke-dasharray: 300 2200;
+        stroke-dashoffset: 0;
+        animation: laser-move 6.5s linear infinite;
+    }
 
-/* faint soft outline for depth */
-.topbar-ring rect.glow {
-    stroke: rgba(242,201,107,0.04);
-    stroke-width: 6;
-    fill: none;
-    filter: blur(8px);
-}
+    /* faint soft outline for depth */
+    .topbar-ring rect.glow {
+        stroke: rgba(242,201,107,0.04);
+        stroke-width: 6;
+        fill: none;
+        filter: blur(8px);
+    }
 
 @keyframes laser-move {
-    from { stroke-dashoffset: 0; }
-    to { stroke-dashoffset: -2500; }
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: -2500;
+    }
 }
 
 .brand {
@@ -257,16 +262,45 @@ button.tab:hover > span {
     box-shadow: inset 0 -6px 14px rgba(0,0,0,0.6), 0 18px 36px rgba(242,185,80,0.10);
 }
 
-.nav .pip { display: none; }
-#pip-1 { right: 360px; top: 6px; }
-#pip-2 { right: 272px; top: 6px; }
-#pip-3 { right: 200px; top: 6px; }
+.nav .pip {
+    display: none;
+}
+
+#pip-1 {
+    right: 360px;
+    top: 6px;
+}
+
+#pip-2 {
+    right: 272px;
+    top: 6px;
+}
+
+#pip-3 {
+    right: 200px;
+    top: 6px;
+}
 
 /* keep daily looking consistent in desktop */
-#tab-daily { min-width: 100px; }
-#tab-daily > span { margin: 3px; height: 38px; border-radius: 6px; }
-#tab-daily::before { transform: scale(0.98); opacity: 0.45; }
-#tab-daily::after { padding: 2px; border-radius: 10px; }
+#tab-daily {
+    min-width: 100px;
+}
+
+    #tab-daily > span {
+        margin: 3px;
+        height: 38px;
+        border-radius: 6px;
+    }
+
+    #tab-daily::before {
+        transform: scale(0.98);
+        opacity: 0.45;
+    }
+
+    #tab-daily::after {
+        padding: 2px;
+        border-radius: 10px;
+    }
 
 /* Hero */
 .hero {
@@ -281,23 +315,23 @@ button.tab:hover > span {
     filter: drop-shadow(0 8px 26px rgba(242,180,80,0.02));
 }
 
-.hero::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,0.5) 100%);
-}
+    .hero::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0) 45%, rgba(0,0,0,0.5) 100%);
+    }
 
-.hero::after {
-    content: "";
-    position: absolute;
-    inset: 0;
-    pointer-events: none;
-    background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
-    background-size: 58px 58px;
-    opacity: 0.06;
-}
+    .hero::after {
+        content: "";
+        position: absolute;
+        inset: 0;
+        pointer-events: none;
+        background-image: radial-gradient(rgba(255,255,255,0.02) 1px, transparent 1px);
+        background-size: 58px 58px;
+        opacity: 0.06;
+    }
 
 .hero-head {
     text-align: center;
@@ -346,12 +380,12 @@ button.tab:hover > span {
     border: 1px solid rgba(255,255,255,0.02);
 }
 
-.pod.center {
-    background: linear-gradient(180deg,#2b1f10, rgba(0,0,0,0.6));
-    box-shadow: 0 18px 60px rgba(240,180,90,0.06);
-    border: 1px solid rgba(255,195,90,0.06);
-    transform: translateY(-8px);
-}
+    .pod.center {
+        background: linear-gradient(180deg,#2b1f10, rgba(0,0,0,0.6));
+        box-shadow: 0 18px 60px rgba(240,180,90,0.06);
+        border: 1px solid rgba(255,195,90,0.06);
+        transform: translateY(-8px);
+    }
 
 .pill {
     position: absolute;
@@ -364,9 +398,18 @@ button.tab:hover > span {
     color: #fff;
 }
 
-.pill.gold { background: linear-gradient(90deg,var(--gold-1),var(--gold-2)); }
-.pill.silver { background: linear-gradient(90deg,#c6cbd1,#9ea6ae); color: #111; }
-.pill.bronze { background: linear-gradient(90deg,#bd7a4a,#c88a53); }
+    .pill.gold {
+        background: linear-gradient(90deg,var(--gold-1),var(--gold-2));
+    }
+
+    .pill.silver {
+        background: linear-gradient(90deg,#c6cbd1,#9ea6ae);
+        color: #111;
+    }
+
+    .pill.bronze {
+        background: linear-gradient(90deg,#bd7a4a,#c88a53);
+    }
 
 .avatar {
     width: 92px;
@@ -378,14 +421,17 @@ button.tab:hover > span {
     background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
 }
 
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
-}
+    .avatar img {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+        display: block;
+    }
 
-.name { margin-top: 10px; font-weight: 800; }
+.name {
+    margin-top: 10px;
+    font-weight: 800;
+}
 
 .amount {
     margin-top: 8px;
@@ -395,7 +441,11 @@ button.tab:hover > span {
     text-shadow: 0 6px 26px rgba(242,201,107,0.06);
 }
 
-.sales { margin-top: 6px; color: var(--muted); font-size: 13px; }
+.sales {
+    margin-top: 6px;
+    color: var(--muted);
+    font-size: 13px;
+}
 
 /* List */
 .list-card {
@@ -415,19 +465,24 @@ button.tab:hover > span {
     border-radius: 8px;
 }
 
-.row + .row { border-top: 1px solid rgba(255,255,255,0.02); }
+    .row + .row {
+        border-top: 1px solid rgba(255,255,255,0.02);
+    }
 
-.row.header {
-    background: rgba(0,0,0,0.12);
-    color: var(--muted);
-    font-size: 12px;
+    .row.header {
+        background: rgba(0,0,0,0.12);
+        color: var(--muted);
+        font-size: 12px;
+        font-weight: 800;
+        border-radius: 8px;
+        margin-bottom: 8px;
+        padding: 10px 12px;
+    }
+
+.rank {
     font-weight: 800;
-    border-radius: 8px;
-    margin-bottom: 8px;
-    padding: 10px 12px;
+    color: var(--muted);
 }
-
-.rank { font-weight: 800; color: var(--muted); }
 
 .agent {
     display: flex;
@@ -435,14 +490,16 @@ button.tab:hover > span {
     gap: 12px;
 }
 
-.agent img {
-    width: 42px;
-    height: 42px;
-    border-radius: 50%;
-    object-fit: cover;
-}
+    .agent img {
+        width: 42px;
+        height: 42px;
+        border-radius: 50%;
+        object-fit: cover;
+    }
 
-.agent-name { font-weight: 800; }
+.agent-name {
+    font-weight: 800;
+}
 
 /* team col */
 .team-col {
@@ -456,27 +513,27 @@ button.tab:hover > span {
     z-index: 1;
 }
 
-.team-col::after {
-    content: "";
-    position: absolute;
-    inset: -4px;
-    border-radius: 10px;
-    background: linear-gradient(90deg, rgba(216,168,75,0.85), rgba(242,201,107,0.85));
-    opacity: 0.06;
-    filter: blur(6px);
-    z-index: 0;
-    pointer-events: none;
-}
+    .team-col::after {
+        content: "";
+        position: absolute;
+        inset: -4px;
+        border-radius: 10px;
+        background: linear-gradient(90deg, rgba(216,168,75,0.85), rgba(242,201,107,0.85));
+        opacity: 0.06;
+        filter: blur(6px);
+        z-index: 0;
+        pointer-events: none;
+    }
 
-.team-col::before {
-    content: "";
-    position: absolute;
-    inset: 0;
-    border-radius: 8px;
-    border: 1px solid rgba(242,201,107,0.06);
-    z-index: 2;
-    pointer-events: none;
-}
+    .team-col::before {
+        content: "";
+        position: absolute;
+        inset: 0;
+        border-radius: 8px;
+        border: 1px solid rgba(242,201,107,0.06);
+        z-index: 2;
+        pointer-events: none;
+    }
 
 .badge {
     padding: 4px 8px;
@@ -486,14 +543,25 @@ button.tab:hover > span {
     font-size: 12px;
 }
 
-.amount-list { text-align: right; font-weight: 800; color: var(--gold-2); }
-.sales-list { text-align: center; color: var(--muted); font-weight: 700; }
+.amount-list {
+    text-align: right;
+    font-weight: 800;
+    color: var(--gold-2);
+}
+
+.sales-list {
+    text-align: center;
+    color: var(--muted);
+    font-weight: 700;
+}
 
 /* Responsive */
 @media (max-width:900px) {
-    .wrap { padding: 12px; }
+    .wrap {
+        padding: 12px;
+    }
 
-    /* top bar stacks nice on mobile */
+    /* top bar stacks on mobile */
     .topbar {
         flex-direction: column;
         align-items: stretch;
@@ -502,35 +570,41 @@ button.tab:hover > span {
 
     .nav {
         justify-content: center;
-        flex-wrap: nowrap;
         gap: 10px;
     }
 
-    /* Make the 3 header buttons equal width so Daily doesn't look "outside" */
+    /* Make topbar buttons equal width and ensure the inner panel fills */
     #btn-daily,
     #btn-weekly,
     #btn-monthly {
         min-width: 0;
-        width: 33.333%;
+        flex: 1 1 0;
     }
 
-    .btn, button.tab {
+    /* Buttons become flex containers so the inner span can truly fill */
+    .btn,
+    button.tab {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
         height: 36px;
-        line-height: 36px;
+        line-height: normal; /* avoid vertical sizing weirdness */
         font-size: 12px;
         letter-spacing: 1.6px;
     }
 
-    .btn > span, button.tab > span {
-        height: 30px;
-        line-height: 30px;
-        margin: 3px;
-        padding: 0 10px; /* tighter so "Daily" centers cleanly */
-        width: calc(100% - 6px); /* ensures the inner dark panel fills the outline */
-        box-sizing: border-box;
-    }
+        .btn > span,
+        button.tab > span {
+            width: 100%;
+            box-sizing: border-box;
+            height: 30px;
+            margin: 3px; /* keeps gold outline spacing consistent */
+            padding: 0 10px; /* tighter so DAILY centers nicely */
+            border-radius: 6px;
+        }
 
-    /* Period tabs: keep consistent sizing too */
+    /* Period tabs should match header button sizing */
     .period-tabs {
         gap: 10px;
     }
@@ -539,31 +613,39 @@ button.tab:hover > span {
     #tab-weekly,
     #tab-monthly {
         min-width: 0;
-        width: 33.333%;
+        flex: 1 1 0;
     }
 
-    #tab-daily > span,
-    #tab-weekly > span,
-    #tab-monthly > span {
-        width: calc(100% - 6px);
-        box-sizing: border-box;
-        padding: 0 10px;
-    }
-
-    /* Podium: force order 1st -> 2nd -> 3rd on mobile */
+    /* Podium: 1st should be first, and everything centered */
     .podium {
         display: flex;
         flex-direction: column;
+        align-items: center; /* fixes the right-side alignment */
         gap: 12px;
     }
 
-    #pod-1 { order: 1; }
-    #pod-2 { order: 2; }
-    #pod-3 { order: 3; }
-
-    .pod.center {
-        transform: none;
+    /* Force ordering regardless of HTML order */
+    #pod-1 {
+        order: 1;
     }
+
+    #pod-2 {
+        order: 2;
+    }
+
+    #pod-3 {
+        order: 3;
+    }
+
+    /* Make each podium card centered and readable */
+    .pod {
+        width: 100%;
+        max-width: 520px;
+    }
+
+        .pod.center {
+            transform: none;
+        }
 
     .row {
         grid-template-columns: 40px 1fr 120px 120px 84px;
