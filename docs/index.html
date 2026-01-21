@@ -111,21 +111,25 @@
             </div>
 
             <div class="list-card" style="margin-top:22px">
+                <!-- Header uses the EXACT same grid + cell placement classes as data rows -->
                 <div class="row header">
-                    <div class="rank">#</div>
-                    <div>Agent</div>
+                    <div class="rank cell cell-rank">#</div>
 
-                    <div class="team-col has-tip" tabindex="0" aria-describedby="tip-team">
+                    <div class="cell cell-agent">
+                        Agent
+                    </div>
+
+                    <div class="team-col has-tip cell cell-team" tabindex="0" aria-describedby="tip-team">
                         Team <span class="tip-icon" aria-hidden="true">i</span>
                         <span id="tip-team" class="tooltip" role="tooltip">Primary Team</span>
                     </div>
 
-                    <div class="amount-list has-tip" tabindex="0" aria-describedby="tip-amount">
+                    <div class="amount-list has-tip cell cell-amount" tabindex="0" aria-describedby="tip-amount">
                         Amount <span class="tip-icon" aria-hidden="true">i</span>
                         <span id="tip-amount" class="tooltip" role="tooltip">Weekly Premium Written</span>
                     </div>
 
-                    <div class="sales-list has-tip" tabindex="0" aria-describedby="tip-sales">
+                    <div class="sales-list has-tip cell cell-sales" tabindex="0" aria-describedby="tip-sales">
                         Sales <span class="tip-icon" aria-hidden="true">i</span>
                         <span id="tip-sales" class="tooltip" role="tooltip">Policies Issued</span>
                     </div>
@@ -141,7 +145,7 @@
                 </div>
 
                 <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:13px">
-                    
+
                 </div>
             </div>
         </section>
