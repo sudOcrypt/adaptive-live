@@ -100,17 +100,50 @@ html, body {
     height: calc(100% + 16px);
     pointer-events: none;
     z-index: 3;
-    filter: drop-shadow(0 10px 28px rgba(242,180,80,0.14)); /* softened */
+
+    /* KEY FIX: allow glow to extend without a square clip */
+    overflow: visible;
+
+    /* Slightly soften the whole SVG render (avoid harsh edge cutoff) */
+    filter: drop-shadow(0 10px 34px rgba(242,180,80,0.16)) drop-shadow(0 0 26px rgba(242,201,107,0.10));
+}
+
+/* Soft halo behind the ring so the glow falloff isn't constrained to the SVG box */
+.topbar-ring::before {
+    content: "";
+    position: absolute;
+    inset: -26px;
+    border-radius: 18px;
+    pointer-events: none;
+    z-index: -1;
+    background: radial-gradient(closest-side at 50% 50%,
+        rgba(242,201,107,0.18) 0%,
+        rgba(242,201,107,0.08) 35%,
+        rgba(242,201,107,0.02) 62%,
+        rgba(242,201,107,0.00) 78%);
+    filter: blur(18px);
+    opacity: 0.9;
+}
+
+/* soften glow rectangle for depth */
+.topbar-ring rect.glow {
+    stroke: rgba(242,201,107,0.035);
+    stroke-width: 8;
+    fill: none;
+    filter: blur(10px);
 }
 
     .topbar-ring path.base {
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-width: 3.5;
+        stroke-width: 3.25;
         fill: none;
         stroke: url(#topbarGrad);
         stroke-opacity: 1;
-        filter: blur(0.6px) drop-shadow(0 6px 20px rgba(242,180,80,0.09)); /* softened */
+
+        /* Softer, less “hard neon” */
+        filter: blur(1.2px) drop-shadow(0 8px 26px rgba(242,180,80,0.10)) drop-shadow(0 0 18px rgba(242,201,107,0.09));
+
         /* dash pattern: short visible head + long gap to create a single moving laser head */
         stroke-dasharray: 300 2200;
         stroke-dashoffset: 0;
@@ -121,22 +154,17 @@ html, body {
     .topbar-ring path.head {
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-width: 8;
+        stroke-width: 9;
         fill: none;
         stroke: url(#laserHead);
         stroke-opacity: 0.95;
-        filter: blur(4px) drop-shadow(0 12px 30px rgba(242,180,80,0.22));
+
+        /* More blur, more falloff, less clipping feel */
+        filter: blur(6px) drop-shadow(0 14px 40px rgba(242,180,80,0.22)) drop-shadow(0 0 26px rgba(242,201,107,0.12));
+
         stroke-dasharray: 300 2200;
         stroke-dashoffset: 0;
         animation: laser-move 6.5s linear infinite;
-    }
-
-    /* faint soft outline for depth */
-    .topbar-ring rect.glow {
-        stroke: rgba(242,201,107,0.04);
-        stroke-width: 6;
-        fill: none;
-        filter: blur(8px);
     }
 
 @keyframes laser-move {
