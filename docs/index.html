@@ -11,6 +11,7 @@
 
     <div class="wrap">
         <div class="topbar" role="banner" aria-label="Top bar">
+            <!-- single solid laser SVG ring around entire topbar (laser head moves via stroke-dashoffset) -->
             <svg class="topbar-ring" viewBox="0 0 1200 76" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
                     <linearGradient id="topbarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -19,6 +20,7 @@
                         <stop offset="100%" stop-color="var(--gold-1)" stop-opacity="1" />
                     </linearGradient>
 
+                    <!-- gradient for the glowing head that fades toward the tail -->
                     <linearGradient id="laserHead" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stop-color="var(--gold-2)" stop-opacity="1" />
                         <stop offset="18%" stop-color="var(--gold-1)" stop-opacity="0.95" />
@@ -28,8 +30,13 @@
                     </linearGradient>
                 </defs>
 
+                <!-- subtle glow rectangle for depth -->
                 <rect class="glow" x="8" y="8" rx="12" ry="12" width="1184" height="60" />
+
+                <!-- base path (thin) -->
                 <path class="base" d="M 14 14 H 1186 A 8 8 0 0 1 1194 22 V 54 A 8 8 0 0 1 1186 62 H 14 A 8 8 0 0 1 6 54 V 22 A 8 8 0 0 1 14 14 Z" />
+
+                <!-- glowing head path (thicker, blurred, fades along gradient) -->
                 <path class="head" d="M 14 14 H 1186 A 8 8 0 0 1 1194 22 V 54 A 8 8 0 0 1 1186 62 H 14 A 8 8 0 0 1 6 54 V 22 A 8 8 0 0 1 14 14 Z" />
             </svg>
 
