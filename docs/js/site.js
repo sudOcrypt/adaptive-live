@@ -1,23 +1,63 @@
+// GitHub Pages mode: loads from /docs/data/leaderboard-<period>.json
 const POLL_MS = 30000;
 let lastTimestamp = null;
-window.agents = [];
 
+window.agents = window.agents || [];
 window.knownAgents = window.knownAgents || [];
+
+window.knownAgents = [
+    { name: "Trevor Berends", team: "adaptive" },
+    { name: "Tommy Sheridan", team: "n3c" },
+    { name: "Aaron Masters", team: "dialed" },
+    { name: "Darien Meza", team: "n3c" },
+    { name: "Mason Pin-Bowder", team: "adaptive" },
+    { name: "Matt Walker", team: "wkr" },
+    { name: "Reese Trujillo", team: "afg" },
+    { name: "Sean Fisher", team: "afg" },
+    { name: "Tyler Harshbarger", team: "blackoak" },
+    { name: "Andrew S", team: "adaptive" },
+    { name: "Kaden Ramey", team: "dialed" },
+    { name: "Jack Warren", team: "wkr" },
+    { name: "Max Hanson", team: "wkr" },
+    { name: "Seamus Hayes", team: "adaptive" },
+    { name: "Tanner Forston", team: "dialed" },
+    { name: "Caleb Dotterer", team: "adaptive" },
+    { name: "Gino", team: "afg" },
+    { name: "Peewee", team: "wkr" },
+    { name: "Aiden Verdi", team: "afg" },
+    { name: "Darrell H", team: "dialed" },
+    { name: "Elijah Wilburn", team: "dialed" },
+    { name: "Johan Serna", team: "afg" },
+    { name: "Eric Eggatt", team: "afg" },
+    { name: "Caden Harshbarger", team: "blackoak" },
+    { name: "Brandon Richardson", team: "afg" },
+    { name: "Noah Doddridge", team: "n3c" },
+    { name: "Orison Nakvoss", team: "adaptive" },
+    { name: "Landen Krantz", team: "wkr" },
+    { name: "Deangelo Weekly", team: "dialed" },
+    { name: "Decarlos Frazier", team: "adaptive" },
+    { name: "Rylan P", team: "afg" },
+    { name: "Joshua Taylor", team: "afg" },
+    { name: "Daniel Zelenko", team: "afg" },
+    { name: "Ahjay Baez", team: "dialed" },
+    { name: "Alex Pappas", team: "dialed" },
+    { name: "Donovon P. Rogers", team: "adaptive" },
+    { name: "Dovi Clermont", team: "blackoak" },
+    { name: "Freedom", team: "blackoak" },
+    { name: "Giancarlo Palmeri", team: "adaptive" },
+    { name: "Jared Aigner", team: "afg" },
+    { name: "Jocelyn", team: "blackoak" },
+    { name: "Joel Rodriguez", team: "wkr" },
+    { name: "Josh Z", team: "afg" },
+    { name: "Kaelyn Jones", team: "n3c" },
+    { name: "Matthew Hedquist", team: "adaptive" },
+    { name: "Tayden Tindle", team: "adaptive" },
+    { name: "Irv Bevelle", team: "n3c" }
+];
 
 const blank = 'data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=';
 
 function fmt(v) { return '$' + Number(v).toLocaleString(); }
-
-function getCurrentPeriod() {
-    const hash = (location.hash || '#daily').replace('#', '').toLowerCase();
-    if (['daily', 'weekly', 'monthly'].includes(hash)) return hash;
-    return 'daily';
-}
-
-function buildUrlForPeriod() {
-    const period = getCurrentPeriod();
-    return `data/leaderboard-${encodeURIComponent(period)}.json`;
-}
 
 function fullTeamName(code) {
     if (!code) return '';
@@ -36,6 +76,17 @@ function lookupTeamByName(name) {
     if (!name) return '';
     const found = window.knownAgents.find(a => a.name.toLowerCase() === name.toLowerCase());
     return found ? found.team : '';
+}
+
+function getCurrentPeriod() {
+    const hash = (location.hash || '#daily').replace('#', '').toLowerCase();
+    if (['daily', 'weekly', 'monthly'].includes(hash)) return hash;
+    return 'daily';
+}
+
+function buildUrlForPeriod() {
+    const period = getCurrentPeriod();
+    return `data/leaderboard-${encodeURIComponent(period)}.json`;
 }
 
 function makeRow(a) {
@@ -74,7 +125,7 @@ function makeRow(a) {
 
     const colSales = document.createElement('div');
     colSales.className = 'sales-list';
-    colSales.textContent = (a.sales === 1) ? '1 sale' : (a.sales > 1 ? a.sales + ' Sales' : '');
+    colSales.textContent = (a.sales === 1) ? '1 sale' : (a.sales > 1 ? `${a.sales} Sales` : '');
 
     row.appendChild(colRank);
     row.appendChild(colAgent);
@@ -88,10 +139,10 @@ function makeRow(a) {
 function updatePodiumUI() {
     const top = (window.agents || []).slice(0, 3);
 
-    function setPod(idPrefix, ent, avatarElId) {
-        const nameEl = document.getElementById(idPrefix === 1 ? 'name1' : idPrefix === 2 ? 'name2' : 'name3');
-        const amtEl = document.getElementById(idPrefix === 1 ? 'amt1' : idPrefix === 2 ? 'amt2' : 'amt3');
-        const salesEl = document.getElementById(idPrefix === 1 ? 'sales1' : idPrefix === 2 ? 'sales2' : 'sales3');
+    function setPod(place, ent, avatarElId) {
+        const nameEl = document.getElementById(place === 1 ? 'name1' : place === 2 ? 'name2' : 'name3');
+        const amtEl = document.getElementById(place === 1 ? 'amt1' : place === 2 ? 'amt2' : 'amt3');
+        const salesEl = document.getElementById(place === 1 ? 'sales1' : place === 2 ? 'sales2' : 'sales3');
         const avatarEl = document.getElementById(avatarElId);
 
         if (!ent || !ent.name) {
@@ -104,7 +155,7 @@ function updatePodiumUI() {
 
         nameEl.textContent = ent.name;
         amtEl.textContent = (ent.amount != null && ent.amount > 0) ? fmt(ent.amount) : '';
-        salesEl.textContent = (ent.sales === 1) ? '1 sale' : (ent.sales > 1 ? ent.sales + ' Sales' : '');
+        salesEl.textContent = (ent.sales === 1) ? '1 sale' : (ent.sales > 1 ? `${ent.sales} Sales` : '');
         if (avatarEl) avatarEl.src = ent.avatar || blank;
     }
 
@@ -116,11 +167,9 @@ function updatePodiumUI() {
 function renderList() {
     const rows = document.getElementById('rowsContainer');
     rows.innerHTML = '';
-
     if (Array.isArray(window.agents) && window.agents.length) {
         window.agents.slice(3).forEach(a => rows.appendChild(makeRow(a)));
     }
-
     updatePodiumUI();
 }
 
@@ -155,7 +204,8 @@ function setActivePeriodUI(period) {
     document.querySelectorAll('.btn.gold').forEach(b => b.classList.toggle('active', b.dataset.period === period));
     document.querySelectorAll('.period-tabs .tab, .tab').forEach(t => t.classList.toggle('active', t.dataset.period === period));
     const label = period.charAt(0).toUpperCase() + period.slice(1);
-    document.getElementById('period-sub').textContent = `${label} sales — updated automatically`;
+    const el = document.getElementById('period-sub');
+    if (el) el.textContent = `${label} sales — updated automatically`;
     lastTimestamp = null;
 }
 
