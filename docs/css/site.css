@@ -1,4 +1,3 @@
-/* Palette */
 :root {
     --bg: #060607;
     --panel: #0f0f10;
@@ -6,13 +5,11 @@
     --gold-2: #f2c96b;
     --muted: #8a8a8a;
     --glass: rgba(255,255,255,0.03);
-    /* softened shadows/glow a bit */
     --card-shadow: 0 18px 60px rgba(0,0,0,0.6);
     --glow: 0 6px 30px rgba(242,180,80,0.06);
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
 }
 
-/* Make page a column so footer can sit at the bottom without overlapping content */
 html, body {
     height: 100%;
     margin: 0;
@@ -25,7 +22,6 @@ html, body {
     min-height: 100vh;
 }
 
-/* Particle canvas sits behind everything */
 #particles {
     position: fixed;
     inset: 0;
@@ -33,17 +29,15 @@ html, body {
     pointer-events: none;
 }
 
-/* Page container grows to fill available space so footer stays below */
 .wrap {
     max-width: 1200px;
     margin: 28px auto;
     padding: 0 20px;
     position: relative;
-    z-index: 1; /* sit above particles */
+    z-index: 1;
     flex: 1 0 auto;
 }
 
-/* Footer at bottom; won't cover contents because .wrap grows */
 .site-footer {
     flex-shrink: 0;
     height: 64px;
@@ -59,7 +53,6 @@ html, body {
     box-shadow: 0 -8px 30px rgba(0,0,0,0.6);
 }
 
-/* Top bar */
 .topbar {
     display: flex;
     align-items: center;
@@ -69,10 +62,9 @@ html, body {
     background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.15));
     box-shadow: var(--card-shadow);
     position: relative;
-    overflow: visible; /* allow ring to show around header */
+    overflow: visible;
 }
 
-/* single solid laser head that moves along the topbar path */
 .topbar-ring {
     position: absolute;
     top: -8px;
@@ -81,7 +73,7 @@ html, body {
     height: calc(100% + 16px);
     pointer-events: none;
     z-index: 3;
-    filter: drop-shadow(0 10px 28px rgba(242,180,80,0.14)); /* softened */
+    filter: drop-shadow(0 10px 28px rgba(242,180,80,0.14));
 }
 
 .topbar-ring path.base {
@@ -91,14 +83,12 @@ html, body {
     fill: none;
     stroke: url(#topbarGrad);
     stroke-opacity: 1;
-    filter: blur(0.6px) drop-shadow(0 6px 20px rgba(242,180,80,0.09)); /* softened */
-    /* dash pattern: short visible head + long gap to create a single moving laser head */
+    filter: blur(0.6px) drop-shadow(0 6px 20px rgba(242,180,80,0.09));
     stroke-dasharray: 300 2200;
     stroke-dashoffset: 0;
     animation: laser-move 6.5s linear infinite;
 }
 
-/* brighter, softened glowing head that fades toward the tail */
 .topbar-ring path.head {
     stroke-linecap: round;
     stroke-linejoin: round;
@@ -112,7 +102,6 @@ html, body {
     animation: laser-move 6.5s linear infinite;
 }
 
-/* faint soft outline for depth */
 .topbar-ring rect.glow {
     stroke: rgba(242,201,107,0.04);
     stroke-width: 6;
@@ -125,17 +114,8 @@ html, body {
     to { stroke-dashoffset: -2500; }
 }
 
-.brand {
-    display: flex;
-    align-items: center;
-    gap: 12px;
-    z-index: 4;
-}
-
-.logo-wrap {
-    position: relative;
-    display: inline-block;
-}
+.brand { display:flex; align-items:center; gap:12px; z-index:4; }
+.logo-wrap { position:relative; display:inline-block; }
 
 .logo {
     display: flex;
@@ -149,18 +129,9 @@ html, body {
     position: relative;
     z-index: 5;
     white-space: nowrap;
-    text-shadow: 0 3px 14px rgba(0,0,0,0.5); /* softened */
+    text-shadow: 0 3px 14px rgba(0,0,0,0.5);
 }
 
-.nav {
-    display: flex;
-    gap: 12px;
-    align-items: center;
-    z-index: 5;
-    position: relative;
-}
-
-/* logo image */
 .logo-img {
     width: 40px;
     height: 40px;
@@ -172,7 +143,17 @@ html, body {
     flex: 0 0 auto;
 }
 
-/* BUTTON */
+.logo-text { display:inline-flex; align-items:center; gap:8px; }
+.logo-sub { color: var(--muted); font-weight: 600; margin-left: 8px; }
+
+.nav {
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    z-index: 5;
+    position: relative;
+}
+
 .btn,
 button.tab {
     position: relative;
@@ -193,10 +174,8 @@ button.tab {
     -webkit-box-reflect: bottom 1px linear-gradient(transparent, #0004);
 }
 
-/* make the Daily button slightly narrower so the inner dark panel fills edge like the others */
 #btn-daily { min-width: 100px; }
 
-/* soft blurred gold glow behind button */
 .btn::before,
 button.tab::before {
     content: "";
@@ -212,7 +191,6 @@ button.tab::before {
     pointer-events: none;
 }
 
-/* crisp gold outline */
 .btn::after,
 button.tab::after {
     content: "";
@@ -228,7 +206,6 @@ button.tab::after {
     pointer-events: none;
 }
 
-/* inner dark panel holds text */
 .btn > span,
 button.tab > span {
     position: relative;
@@ -247,12 +224,8 @@ button.tab > span {
     letter-spacing: 2px;
 }
 
-/* hover */
 .btn:hover::before,
-button.tab:hover::before {
-    opacity: 0.78;
-    transform: scale(1.02);
-}
+button.tab:hover::before { opacity: 0.78; transform: scale(1.02); }
 
 .btn:hover > span,
 button.tab:hover > span {
@@ -260,25 +233,23 @@ button.tab:hover > span {
     box-shadow: inset 0 -6px 14px rgba(0,0,0,0.6), 0 18px 36px rgba(242,185,80,0.10);
 }
 
-/* small gold "pips" under buttons (decorative) */
 .nav .pip { display: none; }
 
-/* Make center Daily match the header Daily visually */
 #tab-daily { min-width: 100px; }
 #tab-daily > span { margin: 3px; height: 38px; border-radius: 6px; }
 #tab-daily::before { transform: scale(0.98); opacity: 0.45; }
 #tab-daily::after { padding: 2px; border-radius: 10px; }
 
-/* Hero */
 .hero {
     position: relative;
     margin-top: 18px;
     border-radius: 12px;
     overflow: hidden;
     padding: 40px 32px;
-    background: radial-gradient(ellipse at 30% 10%, rgba(242,201,107,0.05) 0%, transparent 18%),
-                radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.02) 0%, transparent 8%),
-                linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.28));
+    background:
+        radial-gradient(ellipse at 30% 10%, rgba(242,201,107,0.05) 0%, transparent 18%),
+        radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.02) 0%, transparent 8%),
+        linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.28));
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(255,195,90,0.03);
     filter: drop-shadow(0 8px 26px rgba(242,180,80,0.02));
@@ -302,11 +273,7 @@ button.tab:hover > span {
     opacity: 0.06;
 }
 
-.hero-head {
-    text-align: center;
-    z-index: 1;
-    position: relative;
-}
+.hero-head { text-align: center; z-index: 1; position: relative; }
 
 .hero-title {
     font-size: 34px;
@@ -315,9 +282,9 @@ button.tab:hover > span {
     text-shadow: 0 5px 22px rgba(242,185,80,0.05);
 }
 
+.hero-title-accent { color: var(--gold-2); }
 .hero-sub { margin-top: 6px; color: var(--muted); }
 
-/* Period tabs */
 .period-tabs {
     margin-top: 18px;
     display: flex;
@@ -327,7 +294,6 @@ button.tab:hover > span {
     position: relative;
 }
 
-/* Podium layout */
 .podium {
     display: grid;
     grid-template-columns: 1fr 1.2fr 1fr;
@@ -378,12 +344,14 @@ button.tab:hover > span {
     background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
 }
 
-.avatar img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    display: block;
+.avatar-1 {
+    width: 104px;
+    height: 104px;
+    border-color: rgba(242,201,107,0.18);
+    box-shadow: 0 18px 60px rgba(242,201,107,0.06);
 }
+
+.avatar img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
 .name { margin-top: 10px; font-weight: 800; }
 
@@ -397,7 +365,6 @@ button.tab:hover > span {
 
 .sales { margin-top: 6px; color: var(--muted); font-size: 13px; }
 
-/* List / table */
 .list-card {
     margin-top: 20px;
     background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.22));
@@ -433,7 +400,6 @@ button.tab:hover > span {
 .agent img { width: 42px; height: 42px; border-radius: 50%; object-fit: cover; }
 .agent-name { font-weight: 800; }
 
-/* team column */
 .team-col {
     position: relative;
     padding: 8px 12px;
@@ -467,21 +433,15 @@ button.tab:hover > span {
     pointer-events: none;
 }
 
-.badge {
-    padding: 4px 8px;
-    border-radius: 10px;
-    background: linear-gradient(90deg, rgba(255,255,255,0.03), rgba(0,0,0,0.2));
-    color: var(--muted);
-    font-size: 12px;
-}
-
 .amount-list { text-align: right; font-weight: 800; color: var(--gold-2); }
 .sales-list { text-align: center; color: var(--muted); font-weight: 700; }
 
-/* Responsive */
+.list-note { text-align: center; margin-top: 10px; color: var(--muted); font-size: 13px; }
+
 @media (max-width:900px) {
     .podium { grid-template-columns: 1fr; gap: 12px; }
     .pod.center { transform: none; }
+
     .row { grid-template-columns: 40px 1fr 120px 120px 84px; }
     .wrap { padding: 12px; }
 
