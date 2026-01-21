@@ -1,4 +1,3 @@
-// Particle background: subtle, tough gold particles
 (function () {
     const canvas = document.getElementById('particles');
     const ctx = canvas.getContext('2d');
@@ -27,19 +26,18 @@
                 ttl: 0,
                 rot: rand(0, Math.PI * 2),
                 rotSpeed: rand(-0.02, 0.02),
-                hue: rand(40, 48), // gold-y hue
+                hue: rand(40, 48),
                 alpha: rand(0.08, 0.22)
             });
         }
     }
     createParticles();
 
-    // Emit a few brighter, golden particles from the #1 podium to create "elite" status
     const ELITE_MAX = 300;
+
     function emitElite(count = 3) {
         const pod = document.getElementById('pod-1');
         if (!pod) return;
-        // avoid runaway particle growth
         if (particles.length > ELITE_MAX) return;
         const rect = pod.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
@@ -50,7 +48,7 @@
                 x: cx + rand(-rect.width * 0.25, rect.width * 0.25),
                 y: cy + rand(-rect.height * 0.1, rect.height * 0.1),
                 vx: rand(-0.6, 0.6),
-                vy: rand(-0.6, -1.25), // stronger upward motion
+                vy: rand(-0.6, -1.25),
                 size,
                 life: rand(4, 10),
                 ttl: 0,
@@ -62,7 +60,6 @@
         }
     }
 
-    // small sparkles near #1 to make the #1 spot more obvious (noticeable, not distracting)
     function emitSparkles(count = 2) {
         const pod = document.getElementById('pod-1');
         if (!pod) return;
@@ -86,15 +83,8 @@
         }
     }
 
-    // periodic small bursts from podium
-    setInterval(() => {
-        emitElite(Math.round(rand(1, 3)));
-    }, 450);
-
-    // more frequent small sparkles (makes #1 more prominent)
-    setInterval(() => {
-        emitSparkles(Math.round(rand(1, 3)));
-    }, 220);
+    setInterval(() => emitElite(Math.round(rand(1, 3))), 450);
+    setInterval(() => emitSparkles(Math.round(rand(1, 3))), 220);
 
     function drawParticle(p) {
         ctx.save();
@@ -120,9 +110,9 @@
             p.y += p.vy;
             p.rot += p.rotSpeed;
             p.ttl += 0.01;
-            // gentle wobble
+
             p.vx += Math.sin(p.ttl + i) * 0.0008;
-            // recycle when out of bounds or life exceeded
+
             if (p.y < -40 || p.x < -40 || p.x > width + 40 || p.ttl > p.life) {
                 p.x = rand(-20, width + 20);
                 p.y = height + rand(10, 80);
@@ -133,13 +123,13 @@
                 p.size = rand(1.8, 6.5);
                 p.alpha = rand(0.06, 0.22);
             }
+
             drawParticle(p);
         }
         requestAnimationFrame(step);
     }
     requestAnimationFrame(step);
 
-    // recreate scaled particle count on big resize
     let resizeTimer;
     window.addEventListener('resize', () => {
         clearTimeout(resizeTimer);
