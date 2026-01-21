@@ -10,6 +10,12 @@
     --card-shadow: 0 18px 60px rgba(0,0,0,0.6);
     --glow: 0 6px 30px rgba(242,180,80,0.06);
     font-family: Inter, system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial;
+    /* Leaderboard list column tracks (shared by header + rows) */
+    --lb-col-rank: 56px;
+    --lb-col-team: 160px;
+    --lb-col-amount: 190px;
+    --lb-col-sales: 110px;
+    --lb-gap: 14px;
 }
 
 /* Make page a column so footer can sit at the bottom without overlapping content */
@@ -134,8 +140,13 @@ html, body {
     }
 
 @keyframes laser-move {
-    from { stroke-dashoffset: 0; }
-    to { stroke-dashoffset: -2500; }
+    from {
+        stroke-dashoffset: 0;
+    }
+
+    to {
+        stroke-dashoffset: -2500;
+    }
 }
 
 .brand {
@@ -274,9 +285,20 @@ button.tab:hover > span {
     display: none;
 }
 
-#pip-1 { right: 360px; top: 6px; }
-#pip-2 { right: 272px; top: 6px; }
-#pip-3 { right: 200px; top: 6px; }
+#pip-1 {
+    right: 360px;
+    top: 6px;
+}
+
+#pip-2 {
+    right: 272px;
+    top: 6px;
+}
+
+#pip-3 {
+    right: 200px;
+    top: 6px;
+}
 
 /* keep daily looking consistent in desktop */
 #tab-daily {
@@ -306,13 +328,10 @@ button.tab:hover > span {
     border-radius: 12px;
     overflow: visible;
     padding: 40px 32px;
-    background: radial-gradient(ellipse at 30% 10%, rgba(242,201,107,0.05) 0%, transparent 18%),
-                radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.02) 0%, transparent 8%),
-                linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.28));
+    background: radial-gradient(ellipse at 30% 10%, rgba(242,201,107,0.05) 0%, transparent 18%), radial-gradient(ellipse at 80% 90%, rgba(255,255,255,0.02) 0%, transparent 8%), linear-gradient(180deg, rgba(255,255,255,0.02), rgba(0,0,0,0.28));
     box-shadow: var(--card-shadow);
     border: 1px solid rgba(255,195,90,0.03);
     filter: drop-shadow(0 8px 26px rgba(242,180,80,0.02));
-
     /* Make sure pseudo-elements can be safely placed behind children */
     isolation: isolate;
 }
@@ -324,13 +343,8 @@ button.tab:hover > span {
         position: absolute;
         inset: 0;
         pointer-events: none;
-
         /* was: radial-gradient(..., rgba(0,0,0,0.5) 100%) */
-        background: radial-gradient(ellipse at center,
-            rgba(0,0,0,0.00) 0%,
-            rgba(0,0,0,0.10) 70%,
-            rgba(0,0,0,0.16) 100%);
-
+        background: radial-gradient(ellipse at center, rgba(0,0,0,0.00) 0%, rgba(0,0,0,0.10) 70%, rgba(0,0,0,0.16) 100%);
         z-index: -1;
     }
 
@@ -382,6 +396,7 @@ button.tab:hover > span {
     margin-top: 26px;
 }
 
+/* Base podium card */
 .pod {
     background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.18));
     border-radius: 12px;
@@ -390,6 +405,7 @@ button.tab:hover > span {
     min-height: 190px;
     position: relative;
     border: 1px solid rgba(255,255,255,0.02);
+    /* FIX: badges sit outside the card (top:-18px), so the card cannot clip overflow */
     overflow: visible;
     transition: transform .22s ease, opacity .22s ease;
     will-change: transform, opacity;
@@ -403,73 +419,101 @@ button.tab:hover > span {
         transform: translateY(-6px) rotateX(1deg) rotateY(0.8deg);
     }
 
-#pod-1::before {
-    content: "";
-    position: absolute;
-    left: 50%;
-    top: 48%;
-    width: 74%;
-    height: 78%;
-    transform: translate(-50%, -50%) scale(0.98);
-    border-radius: 16px;
-    background: radial-gradient(closest-side, rgba(242,201,107,0.12), rgba(242,201,107,0.06) 45%, rgba(0,0,0,0) 70%);
-    opacity: 0.0;
-    pointer-events: none;
-    z-index: 0;
-    animation: idlePulse 7s ease-in-out infinite;
-    will-change: opacity, transform;
-    filter: blur(12px);
-}
+    /* --- Prestige accents (no sheen) --- */
 
-#pod-1 {
-    position: relative;
-    z-index: 1;
-}
-
-@keyframes idlePulse {
-    0%, 100% {
+    /* Shared: top accent line (reads instantly as "ranked") */
+    .pod::after {
+        content: "";
+        position: absolute;
+        left: 14px;
+        right: 14px;
+        top: 10px;
+        height: 2px;
+        border-radius: 999px;
         opacity: 0.0;
-        transform: translate(-50%, -50%) scale(0.98);
+        pointer-events: none;
+        z-index: 1;
     }
 
-    50% {
-        opacity: 0.12;
-        transform: translate(-50%, -50%) scale(1.02);
+    /* Shared: aura/halo behind the card (subtle, doesn’t overlap other UI) */
+    .pod::before {
+        content: "";
+        position: absolute;
+        inset: -40px;
+        border-radius: 18px;
+        pointer-events: none;
+        opacity: 0;
+        z-index: 0;
+        filter: blur(18px);
     }
+
+/* 1st place: stronger glow + border + depth */
+#pod-1 {
+    transform: translateY(-10px);
+    border-color: rgba(242,201,107,0.16);
+    box-shadow: 0 24px 90px rgba(242,185,80,0.12), 0 14px 50px rgba(0,0,0,0.70);
 }
 
-@media (prefers-reduced-motion: reduce) {
     #pod-1::before {
-        animation: none;
-        opacity: 0;
+        opacity: 0.85;
+        background: radial-gradient(closest-side at 50% 30%, rgba(242,201,107,0.22) 0%, rgba(242,201,107,0.10) 38%, rgba(0,0,0,0) 72%);
     }
 
+    #pod-1::after {
+        opacity: 0.95;
+        background: linear-gradient(90deg, rgba(216,168,75,0), rgba(242,201,107,0.95), rgba(216,168,75,0));
+    }
+
+/* 2nd place: silver accents */
+#pod-2 {
+    border-color: rgba(198,203,209,0.12);
+    box-shadow: 0 18px 70px rgba(198,203,209,0.05), 0 12px 34px rgba(0,0,0,0.65);
+}
+
+    #pod-2::before {
+        opacity: 0.55;
+        background: radial-gradient(closest-side at 50% 30%, rgba(198,203,209,0.16) 0%, rgba(198,203,209,0.06) 42%, rgba(0,0,0,0) 74%);
+    }
+
+    #pod-2::after {
+        opacity: 0.65;
+        background: linear-gradient(90deg, rgba(198,203,209,0), rgba(198,203,209,0.75), rgba(198,203,209,0));
+    }
+
+/* 3rd place: bronze accents */
+#pod-3 {
+    border-color: rgba(200,138,83,0.14);
+    box-shadow: 0 16px 60px rgba(200,138,83,0.05), 0 12px 34px rgba(0,0,0,0.62);
+}
+
+    #pod-3::before {
+        opacity: 0.50;
+        background: radial-gradient(closest-side at 50% 30%, rgba(200,138,83,0.14) 0%, rgba(200,138,83,0.06) 40%, rgba(0,0,0,0) 74%);
+    }
+
+    #pod-3::after {
+        opacity: 0.55;
+        background: linear-gradient(90deg, rgba(200,138,83,0), rgba(200,138,83,0.70), rgba(200,138,83,0));
+    }
+
+/* Existing center styling kept, but softened to not fight new accents */
+.pod.center {
+    background: linear-gradient(180deg,#2b1f10, rgba(0,0,0,0.6));
+    transform: translateY(-12px);
+}
+
+/* Reduced motion: keep everything static */
+@media (prefers-reduced-motion: reduce) {
     .pod, .pod.center {
-        transition: none;
+        transition: none !important;
     }
 
         .pod:hover, .pod.center:hover {
-            transform: none;
+            transform: none !important;
         }
 }
 
-@media (max-width: 900px) {
-    .pod:hover {
-        transform: translateY(-2px) rotateX(0.4deg) rotateY(0.3deg);
-    }
-
-    .pod.center:hover {
-        transform: translateY(-3px) rotateX(0.6deg) rotateY(0.4deg);
-    }
-}
-
-.pod.center {
-    background: linear-gradient(180deg,#2b1f10, rgba(0,0,0,0.6));
-    box-shadow: 0 18px 60px rgba(240,180,90,0.06);
-    border: 1px solid rgba(255,195,90,0.06);
-    transform: translateY(-8px);
-}
-
+/* Pills */
 .pill {
     position: absolute;
     top: -18px;
@@ -479,6 +523,10 @@ button.tab:hover > span {
     border-radius: 20px;
     font-weight: 800;
     color: #fff;
+    /* FIX: ensure badge stays above card accents */
+    z-index: 10;
+    line-height: 1;
+    white-space: nowrap;
 }
 
     .pill.gold {
@@ -504,6 +552,7 @@ button.tab:hover > span {
     overflow: visible;
     background: radial-gradient(circle at 30% 20%, rgba(255,255,255,0.04), rgba(0,0,0,0.4));
     position: relative;
+    z-index: 2;
 }
 
     .avatar img {
@@ -517,6 +566,8 @@ button.tab:hover > span {
 .name {
     margin-top: 10px;
     font-weight: 800;
+    position: relative;
+    z-index: 2;
 }
 
 .amount {
@@ -525,12 +576,16 @@ button.tab:hover > span {
     font-size: 20px;
     color: var(--gold-2);
     text-shadow: 0 6px 26px rgba(242,201,107,0.06);
+    position: relative;
+    z-index: 2;
 }
 
 .sales {
     margin-top: 6px;
     color: var(--muted);
     font-size: 13px;
+    position: relative;
+    z-index: 2;
 }
 
 /* List */
@@ -542,10 +597,11 @@ button.tab:hover > span {
     border: 1px solid rgba(255,255,255,0.02);
 }
 
+/* Leaderboard row: SINGLE shared grid for header + data rows */
 .row {
     display: grid;
-    grid-template-columns: 56px 1fr 160px 190px 110px;
-    gap: 14px;
+    grid-template-columns: var(--lb-col-rank) 1fr var(--lb-col-team) var(--lb-col-amount) var(--lb-col-sales);
+    column-gap: var(--lb-gap);
     align-items: center;
     padding: 12px 14px;
     border-radius: 10px;
@@ -554,26 +610,52 @@ button.tab:hover > span {
     box-shadow: 0 10px 26px rgba(0,0,0,0.28);
 }
 
-    .row:nth-child(even) {
-        background: rgba(255,255,255,0.018);
-        box-shadow: 0 12px 30px rgba(0,0,0,0.34);
-    }
+/* Cells are explicitly assigned to grid columns (no nth-child hacks) */
+.cell {
+    min-width: 0;
+}
 
-    .row + .row {
-        border-top: 0;
-        margin-top: 6px;
-    }
+.cell-rank {
+    grid-column: 1;
+}
 
-    .row.header {
-        background: rgba(0,0,0,0.18);
-        box-shadow: none;
-        color: rgba(255,255,255,0.55);
-        font-size: 12px;
-        font-weight: 800;
-        border-radius: 10px;
-        margin-bottom: 10px;
-        padding: 10px 14px;
-    }
+.cell-agent {
+    grid-column: 2;
+}
+
+.cell-team {
+    grid-column: 3;
+}
+
+.cell-amount {
+    grid-column: 4;
+    text-align: center;
+}
+
+.cell-sales {
+    grid-column: 5;
+    text-align: center;
+}
+
+.row:nth-child(even) {
+    background: rgba(255,255,255,0.018);
+    box-shadow: 0 12px 30px rgba(0,0,0,0.34);
+}
+
+.row + .row {
+    border-top: 0;
+    margin-top: 6px;
+}
+
+.row.header {
+    background: rgba(0,0,0,0.18);
+    box-shadow: none;
+    color: rgba(255,255,255,0.55);
+    font-size: 12px;
+    font-weight: 800;
+    margin-bottom: 10px;
+    padding: 10px 14px;
+}
 
 .rank {
     font-weight: 900;
@@ -581,6 +663,7 @@ button.tab:hover > span {
     letter-spacing: 0.3px;
 }
 
+/* Agent column stays nested-flex, but it lives INSIDE a fixed grid column */
 .agent {
     display: flex;
     align-items: center;
@@ -621,7 +704,6 @@ button.tab:hover > span {
     }
 
 .amount-list {
-    text-align: right;
     font-weight: 950;
     color: rgba(243, 214, 140, 0.98);
     font-variant-numeric: tabular-nums;
@@ -630,7 +712,6 @@ button.tab:hover > span {
 }
 
 .sales-list {
-    text-align: center;
     color: rgba(255,255,255,0.50);
     font-weight: 700;
     font-variant-numeric: tabular-nums;
@@ -715,91 +796,84 @@ button.tab:hover > span {
         transition: none;
         transform: none;
     }
-}
 
-@media (prefers-reduced-motion: reduce) {
     .topbar-ring path.base,
     .topbar-ring path.head,
-    .pod.center::after,
     #pod-1 .avatar::after,
     #pod-1::before {
         animation: none !important;
     }
 }
 
-/* Winner emphasis and effects */
-.pod.center {
-    transform: translateY(-12px);
-    background: linear-gradient(180deg, #3a2b14, rgba(0,0,0,0.65));
-    border: 1px solid rgba(255,195,90,0.14);
-    box-shadow: 0 24px 80px rgba(242,185,80,0.12), 0 6px 22px rgba(0,0,0,0.75));
+/* =========================
+   Podium prestige visuals
+   ========================= */
+
+/* Crown (injected by site.js into #pod-1 .pill.gold). Keep subtle. */
+.pill .crown {
+    font-size: 14px;
+    line-height: 1;
+    margin-right: 8px;
+    filter: saturate(1.05);
+    opacity: 0.92;
 }
 
-    .pod.center::before {
+/* Laurel/gold rim for top 3 avatars (very low opacity). */
+.podium .avatar {
+    position: relative;
+}
+
+    .podium .avatar::before {
         content: "";
         position: absolute;
-        inset: -18px;
-        border-radius: 14px;
-        background: radial-gradient(ellipse at 50% 0%, rgba(242,201,107,0.22) 0%, rgba(242,201,107,0.06) 45%, rgba(0,0,0,0) 60%);
-        filter: blur(12px);
+        inset: -7px;
+        border-radius: 50%;
         pointer-events: none;
-        z-index: 0;
+        opacity: 0.65;
+        background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 62%, rgba(242,201,107,0.18) 65%, rgba(242,201,107,0.03) 74%, rgba(0,0,0,0) 78%);
+        filter: blur(0.2px);
     }
 
-    .pod.center::after {
+    .podium .avatar::after {
         content: "";
         position: absolute;
-        top: 0;
-        left: -150%;
-        width: 120%;
-        height: 100%;
-        background: linear-gradient(110deg, rgba(255,255,255,0) 20%, rgba(255,255,255,0.08) 35%, rgba(255,255,255,0) 50%);
-        transform: skewX(-18deg);
-        animation: sheen 6s ease-in-out infinite;
+        inset: -9px;
+        border-radius: 50%;
         pointer-events: none;
-        z-index: 0;
+        opacity: 0.45;
+        background: conic-gradient(from 210deg, rgba(242,201,107,0) 0deg, rgba(242,201,107,0.10) 22deg, rgba(242,201,107,0) 48deg, rgba(242,201,107,0) 132deg, rgba(242,201,107,0.10) 154deg, rgba(242,201,107,0) 180deg, rgba(242,201,107,0) 360deg);
+        -webkit-mask: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 66%, rgba(0,0,0,0) 74%);
+        mask: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 66%, rgba(0,0,0,0) 74%);
     }
+
+/* Rim intensity per rank */
+#pod-1 .avatar::before {
+    opacity: 0.85;
+}
 
 #pod-1 .avatar::after {
-    content: "";
-    position: absolute;
-    inset: -6px;
-    border-radius: 50%;
-    border: 2px solid rgba(242,201,107,0.25);
-    box-shadow: 0 0 30px rgba(242,201,107,0.25), 0 0 60px rgba(242,201,107,0.12) inset;
-    animation: pulse 2.8s ease-in-out infinite;
-    pointer-events: none;
+    opacity: 0.55;
 }
 
-#pod-1 .name {
-    font-size: 18px;
-    color: #fff;
-    text-shadow: 0 6px 22px rgba(242,201,107,0.10);
+#pod-2 .avatar::before {
+    opacity: 0.65;
 }
 
-@keyframes sheen {
-    from {
-        left: -150%;
-    }
-
-    60% {
-        left: 130%;
-    }
-
-    to {
-        left: 130%;
-    }
+#pod-2 .avatar::after {
+    opacity: 0.40;
 }
 
-@keyframes pulse {
-    0%, 100% {
-        transform: scale(0.98);
-        opacity: 0.65;
-    }
+#pod-3 .avatar::before {
+    opacity: 0.50;
+}
 
-    50% {
-        transform: scale(1.02);
-        opacity: 1;
+#pod-3 .avatar::after {
+    opacity: 0.32;
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .podium .avatar::after {
+        opacity: 0.25;
     }
 }
 
@@ -873,9 +947,17 @@ button.tab:hover > span {
     }
 
     /* Force ordering regardless of HTML order */
-    #pod-1 { order: 1; }
-    #pod-2 { order: 2; }
-    #pod-3 { order: 3; }
+    #pod-1 {
+        order: 1;
+    }
+
+    #pod-2 {
+        order: 2;
+    }
+
+    #pod-3 {
+        order: 3;
+    }
 
     /* Make each podium card centered and readable */
     .pod {
@@ -887,10 +969,6 @@ button.tab:hover > span {
             transform: none; /* keep emphasis without pushing layout on mobile */
         }
 
-    .row {
-        grid-template-columns: 40px 1fr 120px 120px 84px;
-    }
-
     .logo-img {
         width: 32px;
         height: 32px;
@@ -900,77 +978,13 @@ button.tab:hover > span {
         min-width: 160px;
         max-width: 240px;
     }
-}
 
-/* =========================
-   Podium prestige visuals
-   ========================= */
-
-/* Crown (injected by site.js into #pod-1 .pill.gold). Keep subtle. */
-.pill .crown {
-    font-size: 14px;
-    line-height: 1;
-    margin-right: 8px;
-    filter: saturate(1.05);
-    opacity: 0.92;
-}
-
-/* Rank-based podium gradient intensity (1 strongest, 3 weakest). */
-#pod-3.pod {
-    background: linear-gradient(180deg, rgba(255,255,255,0.012), rgba(0,0,0,0.20));
-    border-color: rgba(255,255,255,0.03);
-    box-shadow: 0 18px 60px rgba(0,0,0,0.55);
-}
-
-#pod-2.pod {
-    background: linear-gradient(180deg, rgba(198,203,209,0.05), rgba(0,0,0,0.22));
-    border-color: rgba(198,203,209,0.08);
-    box-shadow: 0 18px 60px rgba(0,0,0,0.58);
-}
-
-#pod-1.pod {
-    background: linear-gradient(180deg, rgba(242,201,107,0.10), rgba(0,0,0,0.45));
-    border-color: rgba(242,201,107,0.14);
-}
-
-/* Laurel/gold rim for top 3 avatars (very low opacity). */
-.podium .avatar {
-    position: relative;
-}
-
-    .podium .avatar::before {
-        content: "";
-        position: absolute;
-        inset: -7px;
-        border-radius: 50%;
-        pointer-events: none;
-        opacity: 0.65;
-        background: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 62%, rgba(242,201,107,0.18) 65%, rgba(242,201,107,0.03) 74%, rgba(0,0,0,0) 78%);
-        filter: blur(0.2px);
-    }
-
-    .podium .avatar::after {
-        content: "";
-        position: absolute;
-        inset: -9px;
-        border-radius: 50%;
-        pointer-events: none;
-        opacity: 0.45;
-        background: conic-gradient(from 210deg, rgba(242,201,107,0) 0deg, rgba(242,201,107,0.10) 22deg, rgba(242,201,107,0) 48deg, rgba(242,201,107,0) 132deg, rgba(242,201,107,0.10) 154deg, rgba(242,201,107,0) 180deg, rgba(242,201,107,0) 360deg);
-        -webkit-mask: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 66%, rgba(0,0,0,0) 74%);
-        mask: radial-gradient(circle at 50% 50%, rgba(0,0,0,0) 60%, rgba(0,0,0,1) 66%, rgba(0,0,0,0) 74%);
-    }
-
-/* Rim intensity per rank */
-#pod-1 .avatar::before { opacity: 0.85; }
-#pod-1 .avatar::after { opacity: 0.55; }
-#pod-2 .avatar::before { opacity: 0.65; }
-#pod-2 .avatar::after { opacity: 0.40; }
-#pod-3 .avatar::before { opacity: 0.50; }
-#pod-3 .avatar::after { opacity: 0.32; }
-
-@media (prefers-reduced-motion: reduce) {
-    .podium .avatar::after {
-        opacity: 0.25;
+    /* Leaderboard columns: keep header + rows in sync */
+    :root {
+        --lb-col-rank: 40px;
+        --lb-col-team: 120px;
+        --lb-col-amount: 120px;
+        --lb-col-sales: 84px;
+        --lb-gap: 14px;
     }
 }
