@@ -4,16 +4,13 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Adaptive Financial — Live Leaderboard</title>
-
-    <!-- GitHub Pages-friendly: reference external stylesheet in /docs/css -->
-    <link rel="stylesheet" href="css/site.css" />
+    <link rel="stylesheet" href="css/site.css?v=1" />
 </head>
 <body>
     <canvas id="particles" aria-hidden="true"></canvas>
 
     <div class="wrap">
         <div class="topbar" role="banner" aria-label="Top bar">
-            <!-- single solid laser SVG ring around entire topbar (laser head moves via stroke-dashoffset) -->
             <svg class="topbar-ring" viewBox="0 0 1200 76" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
                     <linearGradient id="topbarGrad" x1="0%" y1="0%" x2="100%" y2="0%">
@@ -22,7 +19,6 @@
                         <stop offset="100%" stop-color="var(--gold-1)" stop-opacity="1" />
                     </linearGradient>
 
-                    <!-- gradient for the glowing head that fades toward the tail -->
                     <linearGradient id="laserHead" x1="0%" y1="0%" x2="100%" y2="0%">
                         <stop offset="0%" stop-color="var(--gold-2)" stop-opacity="1" />
                         <stop offset="18%" stop-color="var(--gold-1)" stop-opacity="0.95" />
@@ -32,23 +28,17 @@
                     </linearGradient>
                 </defs>
 
-                <!-- subtle glow rectangle for depth -->
                 <rect class="glow" x="8" y="8" rx="12" ry="12" width="1184" height="60" />
-
-                <!-- base path (thin) -->
                 <path class="base" d="M 14 14 H 1186 A 8 8 0 0 1 1194 22 V 54 A 8 8 0 0 1 1186 62 H 14 A 8 8 0 0 1 6 54 V 22 A 8 8 0 0 1 14 14 Z" />
-
-                <!-- glowing head path (thicker, blurred, fades along gradient) -->
                 <path class="head" d="M 14 14 H 1186 A 8 8 0 0 1 1194 22 V 54 A 8 8 0 0 1 1186 62 H 14 A 8 8 0 0 1 6 54 V 22 A 8 8 0 0 1 14 14 Z" />
             </svg>
 
             <div class="brand">
                 <div class="logo-wrap" aria-hidden="true">
                     <div class="logo">
-                        <!-- GitHub Pages-friendly relative asset path -->
                         <img class="logo-img" src="assets/adaptive_logo.png" alt="Adaptive Financial logo" />
-                        <div style="display:inline-flex;align-items:center;gap:8px">
-                            ADAPTIVE <span style="color:var(--muted);font-weight:600;margin-left:8px">FINANCIAL</span>
+                        <div class="logo-text">
+                            ADAPTIVE <span class="logo-sub">FINANCIAL</span>
                         </div>
                     </div>
                 </div>
@@ -66,7 +56,7 @@
 
         <section class="hero" role="main" aria-label="Live leaderboard hero">
             <div class="hero-head">
-                <div class="hero-title">Adaptive Financial <span style="color:var(--gold-2)">Live Leaderboard</span></div>
+                <div class="hero-title">Adaptive Financial <span class="hero-title-accent">Live Leaderboard</span></div>
                 <div class="hero-sub" id="period-sub">Realtime sales totals — updated automatically</div>
             </div>
 
@@ -87,9 +77,7 @@
 
                 <div class="pod center" id="pod-1">
                     <div class="pill gold">1st</div>
-                    <div class="avatar" style="width:104px;height:104px;border-color:rgba(242,201,107,0.18);box-shadow:0 18px 60px rgba(242,201,107,0.06)">
-                        <img id="avatar1" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="1st avatar" />
-                    </div>
+                    <div class="avatar avatar-1"><img id="avatar1" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="1st avatar" /></div>
                     <div class="name" id="name1"></div>
                     <div class="amount" id="amt1"></div>
                     <div class="sales" id="sales1"></div>
@@ -114,9 +102,7 @@
                 </div>
 
                 <div id="rowsContainer" aria-live="polite"></div>
-                <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:13px">
-                    Live data shown. Sub-team badges appear to the right of names.
-                </div>
+                <div class="list-note">Live data shown. Sub-team badges appear to the right of names.</div>
             </div>
         </section>
     </div>
@@ -128,5 +114,4 @@
     <script src="js/site.js" defer></script>
     <script src="js/particles.js" defer></script>
 </body>
-
 </html>
