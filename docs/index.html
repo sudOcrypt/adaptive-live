@@ -4,7 +4,9 @@
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width,initial-scale=1" />
     <title>Adaptive Financial — Live Leaderboard</title>
-    <link rel="stylesheet" href="css/site.css?v=1" />
+
+    <!-- GitHub Pages-friendly: reference external stylesheet in /docs/css -->
+    <link rel="stylesheet" href="css/site.css" />
 </head>
 <body>
     <canvas id="particles" aria-hidden="true"></canvas>
@@ -43,9 +45,10 @@
             <div class="brand">
                 <div class="logo-wrap" aria-hidden="true">
                     <div class="logo">
+                        <!-- GitHub Pages-friendly relative asset path -->
                         <img class="logo-img" src="assets/adaptive_logo.png" alt="Adaptive Financial logo" />
-                        <div class="logo-text">
-                            ADAPTIVE <span class="logo-sub">FINANCIAL</span>
+                        <div style="display:inline-flex;align-items:center;gap:8px">
+                            ADAPTIVE <span style="color:var(--muted);font-weight:600;margin-left:8px">FINANCIAL</span>
                         </div>
                     </div>
                 </div>
@@ -63,7 +66,7 @@
 
         <section class="hero" role="main" aria-label="Live leaderboard hero">
             <div class="hero-head">
-                <div class="hero-title">Adaptive Financial <span class="hero-title-accent">Live Leaderboard</span></div>
+                <div class="hero-title">Adaptive Financial <span style="color:var(--gold-2)">Live Leaderboard</span></div>
                 <div class="hero-sub" id="period-sub">Realtime sales totals — updated automatically</div>
             </div>
 
@@ -84,7 +87,9 @@
 
                 <div class="pod center" id="pod-1">
                     <div class="pill gold">1st</div>
-                    <div class="avatar avatar-1"><img id="avatar1" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="1st avatar" /></div>
+                    <div class="avatar" style="width:104px;height:104px;border-color:rgba(242,201,107,0.18);box-shadow:0 18px 60px rgba(242,201,107,0.06)">
+                        <img id="avatar1" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="1st avatar" />
+                    </div>
                     <div class="name" id="name1"></div>
                     <div class="amount" id="amt1"></div>
                     <div class="sales" id="sales1"></div>
@@ -109,7 +114,9 @@
                 </div>
 
                 <div id="rowsContainer" aria-live="polite"></div>
-                <div class="list-note">Live data shown. Sub-team badges appear to the right of names.</div>
+                <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:13px">
+                    Live data shown. Sub-team badges appear to the right of names.
+                </div>
             </div>
         </section>
     </div>
