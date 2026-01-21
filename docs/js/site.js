@@ -256,11 +256,11 @@ function makeRow(a) {
     row.dataset.name = a.name || "";
 
     const colRank = document.createElement("div");
-    colRank.className = "rank";
+    colRank.className = "rank cell cell-rank";
     colRank.textContent = a.rank ?? "";
 
     const colAgent = document.createElement("div");
-    colAgent.className = "agent";
+    colAgent.className = "agent cell cell-agent";
 
     const img = document.createElement("img");
     img.src = a.avatar || blank;
@@ -276,17 +276,17 @@ function makeRow(a) {
     colAgent.appendChild(nmWrap);
 
     const colTeam = document.createElement("div");
-    colTeam.className = "team-col";
+    colTeam.className = "team-col cell cell-team";
     const teamCode = a.team || lookupTeamByName(a.name) || "";
     colTeam.textContent = fullTeamName(teamCode);
 
     const colAmt = document.createElement("div");
-    colAmt.className = "amount-list";
+    colAmt.className = "amount-list cell cell-amount";
     colAmt.textContent = (a.amount != null && a.amount > 0) ? fmt(a.amount) : "";
     colAmt.dataset.value = String(a.amount ?? 0);
 
     const colSales = document.createElement("div");
-    colSales.className = "sales-list";
+    colSales.className = "sales-list cell cell-sales";
     colSales.textContent = (a.sales === 1) ? "1 sale" : (a.sales > 1 ? a.sales + " Sales" : "");
     colSales.dataset.value = String(a.sales ?? 0);
 
