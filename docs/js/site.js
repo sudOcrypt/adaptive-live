@@ -1,5 +1,6 @@
 const POLL_MS = 30000;
 let lastTimestamp = null;
+
 window.agents = [];
 window.knownAgents = window.knownAgents || [];
 
@@ -7,6 +8,9 @@ const SUPABASE_FUNCTION_BASE =
     "https://bxnnluhfvqtycaptwjdc.supabase.co/functions/v1/leaderboard";
 
 const blank = "data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=";
+
+const prefersReducedMotion = () =>
+    !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
 
 function fmt(v) { return "$" + Number(v).toLocaleString(); }
 
@@ -43,9 +47,218 @@ function lookupTeamByName(name) {
     return found ? found.team : "";
 }
 
+/* ---------- UI state helpers (empty/offline) ---------- */
+let lastSuccessfulFetchAt = null;
+let offlineTimer = 0;
+
+function minsAgoText(fromMs) {
+    if (!fromMs) return "a moment ago";
+    const mins = Math.max(0, Math.floor((Date.now() - fromMs) / 60000));
+    if (mins <= 0) return "just now";
+    if (mins === 1) return "1 min ago";
+    return `${mins} mins ago`;
+}
+
+function setOfflineBannerVisible(visible) {
+    const banner = document.getElementById("offlineBanner");
+    if (!banner) return;
+    banner.hidden = !visible;
+}
+
+function updateOfflineBannerText() {
+    const txt = document.getElementById("offlineText");
+    if (!txt) return;
+
+    const when = minsAgoText(lastSuccessfulFetchAt);
+    txt.textContent = `Last updated ${when} — reconnecting…`;
+}
+
+function showOfflineState() {
+    setOfflineBannerVisible(true);
+    updateOfflineBannerText();
+
+    clearTimeout(offlineTimer);
+    offlineTimer = setTimeout(function tick() {
+        updateOfflineBannerText();
+        offlineTimer = setTimeout(tick, 15000);
+    }, 15000);
+}
+
+function clearOfflineState() {
+    clearTimeout(offlineTimer);
+    offlineTimer = 0;
+    setOfflineBannerVisible(false);
+}
+
+function setEmptyStateVisible(visible) {
+    const empty = document.getElementById("emptyState");
+    if (!empty) return;
+    empty.hidden = !visible;
+}
+
+function clearPodiumUI() {
+    const ids = ["name1", "amt1", "sales1", "avatar1", "name2", "amt2", "sales2", "avatar2", "name3", "amt3", "sales3", "avatar3"];
+    ids.forEach(id => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (id.startsWith("avatar")) el.src = blank;
+        else el.textContent = "";
+        if (el.dataset && (id.startsWith("amt") || id.startsWith("sales"))) el.dataset.value = "0";
+    });
+}
+
+/* ---------- Stable IDs ---------- */
+function stableIdFromAgent(a) {
+    // Prefer explicit ids from backend
+    if (a && (a.id != null && String(a.id).trim() !== "")) return String(a.id);
+
+    // Fallback deterministic key (stable across refreshes)
+    const name = (a?.name || "").trim().toLowerCase();
+    const team = (a?.team || "").trim().toLowerCase();
+    return `name:${name}|team:${team}`;
+}
+
+/* ---------- Counting animations ---------- */
+function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
+
+function animateNumber(el, from, to, format, durationMs = 650) {
+    if (!el) return;
+
+    if (prefersReducedMotion()) {
+        el.textContent = format(to);
+        el.dataset.value = String(to);
+        return;
+    }
+
+    // Cancel any in-flight animation on that element
+    const prevRaf = el.dataset.raf ? Number(el.dataset.raf) : 0;
+    if (prevRaf) cancelAnimationFrame(prevRaf);
+
+    const start = performance.now();
+    const delta = to - from;
+
+    function tick(now) {
+        const p = Math.min(1, (now - start) / durationMs);
+        const v = from + delta * easeOutCubic(p);
+        el.textContent = format(v);
+        if (p < 1) {
+            const id = requestAnimationFrame(tick);
+            el.dataset.raf = String(id);
+        } else {
+            el.textContent = format(to);
+            el.dataset.value = String(to);
+            el.dataset.raf = "";
+        }
+    }
+
+    const id = requestAnimationFrame(tick);
+    el.dataset.raf = String(id);
+}
+
+function parseMoneyTextToNumber(text) {
+    if (!text) return 0;
+    const n = Number(String(text).replace(/[^0-9.-]/g, ""));
+    return Number.isFinite(n) ? n : 0;
+}
+
+function parseSalesTextToNumber(text) {
+    // "", "1 sale", "10 Sales"
+    if (!text) return 0;
+    const m = String(text).match(/(\d+)/);
+    return m ? Number(m[1]) : 0;
+}
+
+function salesFormat(v) {
+    const n = Math.round(Number(v) || 0);
+    if (n <= 0) return "";
+    return n === 1 ? "1 sale" : `${n} Sales`;
+}
+
+/* ---------- FLIP helpers ---------- */
+function measureRects(mapIdToEl) {
+    const rects = new Map();
+    for (const [id, el] of mapIdToEl) {
+        if (!el || !el.isConnected) continue;
+        rects.set(id, el.getBoundingClientRect());
+    }
+    return rects;
+}
+
+function playFLIP(beforeRects, mapIdToEl, options = {}) {
+    const {
+        duration = 420,
+        easing = "cubic-bezier(.2,.8,.2,1)"
+    } = options;
+
+    if (prefersReducedMotion()) return;
+
+    for (const [id, el] of mapIdToEl) {
+        const first = beforeRects.get(id);
+        if (!first || !el || !el.isConnected) continue;
+
+        const last = el.getBoundingClientRect();
+        const dx = first.left - last.left;
+        const dy = first.top - last.top;
+
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
+
+        el.style.transform = `translate(${dx}px, ${dy}px)`;
+        el.style.transition = "transform 0s";
+        el.style.willChange = "transform";
+
+        // Force reflow
+        el.getBoundingClientRect();
+
+        el.style.transition = `transform ${duration}ms ${easing}`;
+        el.style.transform = "";
+
+        window.setTimeout(() => {
+            if (!el.isConnected) return;
+            el.style.transition = "";
+            el.style.transform = "";
+            el.style.willChange = "";
+        }, duration + 30);
+    }
+}
+
+/* ---------- Podium crown bounce ---------- */
+function ensureCrownEl() {
+    const pill = document.querySelector("#pod-1 .pill.gold");
+    if (!pill) return null;
+
+    let crown = pill.querySelector(".crown");
+    if (!crown) {
+        crown = document.createElement("span");
+        crown.className = "crown";
+        crown.textContent = "👑";
+        crown.style.marginRight = "8px";
+        crown.style.display = "inline-block";
+        crown.style.transformOrigin = "50% 100%";
+        pill.insertBefore(crown, pill.firstChild);
+    }
+    return crown;
+}
+
+function crownBounce() {
+    if (prefersReducedMotion()) return;
+    const crown = ensureCrownEl();
+    if (!crown) return;
+
+    crown.animate(
+        [
+            { transform: "translateY(0) scale(1)" },
+            { transform: "translateY(-6px) scale(1.08)" },
+            { transform: "translateY(0) scale(1)" }
+        ],
+        { duration: 520, easing: "cubic-bezier(.2,.9,.2,1)" }
+    );
+}
+
+/* ---------- DOM builders (stable ids, update-in-place) ---------- */
 function makeRow(a) {
     const row = document.createElement("div");
     row.className = "row";
+    row.dataset.id = a.id;
     row.dataset.name = a.name || "";
 
     const colRank = document.createElement("div");
@@ -76,10 +289,12 @@ function makeRow(a) {
     const colAmt = document.createElement("div");
     colAmt.className = "amount-list";
     colAmt.textContent = (a.amount != null && a.amount > 0) ? fmt(a.amount) : "";
+    colAmt.dataset.value = String(a.amount ?? 0);
 
     const colSales = document.createElement("div");
     colSales.className = "sales-list";
     colSales.textContent = (a.sales === 1) ? "1 sale" : (a.sales > 1 ? a.sales + " Sales" : "");
+    colSales.dataset.value = String(a.sales ?? 0);
 
     row.appendChild(colRank);
     row.appendChild(colAgent);
@@ -90,13 +305,76 @@ function makeRow(a) {
     return row;
 }
 
-function updatePodiumUI() {
-    const top = (window.agents || []).slice(0, 3);
+function updateRowInPlace(row, a) {
+    if (!row) return;
 
-    function setPod(idPrefix, ent, avatarElId) {
-        const nameEl = document.getElementById(idPrefix === 1 ? "name1" : idPrefix === 2 ? "name2" : "name3");
-        const amtEl = document.getElementById(idPrefix === 1 ? "amt1" : idPrefix === 2 ? "amt2" : "amt3");
-        const salesEl = document.getElementById(idPrefix === 1 ? "sales1" : idPrefix === 2 ? "sales2" : "sales3");
+    row.dataset.id = a.id;
+    row.dataset.name = a.name || "";
+
+    const rankEl = row.querySelector(".rank");
+    if (rankEl) rankEl.textContent = a.rank ?? "";
+
+    const img = row.querySelector(".agent img");
+    if (img) {
+        const next = a.avatar || blank;
+        if (img.src !== next) img.src = next;
+        img.alt = a.name || "";
+    }
+
+    const nm = row.querySelector(".agent-name");
+    if (nm) nm.textContent = a.name || "";
+
+    const teamEl = row.querySelector(".team-col");
+    if (teamEl) {
+        const teamCode = a.team || lookupTeamByName(a.name) || "";
+        teamEl.textContent = fullTeamName(teamCode);
+    }
+
+    const amtEl = row.querySelector(".amount-list");
+    if (amtEl) {
+        const from = Number(amtEl.dataset.value ?? parseMoneyTextToNumber(amtEl.textContent));
+        const to = Number(a.amount ?? 0);
+        animateNumber(amtEl, from, to, v => (v > 0 ? fmt(v) : ""), 700);
+    }
+
+    const salesEl = row.querySelector(".sales-list");
+    if (salesEl) {
+        const from = Number(salesEl.dataset.value ?? parseSalesTextToNumber(salesEl.textContent));
+        const to = Number(a.sales ?? 0);
+        animateNumber(salesEl, from, to, salesFormat, 600);
+    }
+}
+
+/* ---------- Podium updates + FLIP reorder ---------- */
+let lastTop1Id = null;
+
+function updatePodiumWithFLIP(agents) {
+    const podium = document.querySelector(".podium");
+    if (!podium) return;
+
+    const pod1 = document.getElementById("pod-1");
+    const pod2 = document.getElementById("pod-2");
+    const pod3 = document.getElementById("pod-3");
+    if (!pod1 || !pod2 || !pod3) return;
+
+    const podMap = new Map([
+        ["pod-1", pod1],
+        ["pod-2", pod2],
+        ["pod-3", pod3]
+    ]);
+    const before = measureRects(podMap);
+
+    const top = (agents || []).slice(0, 3);
+    const firstId = top[0]?.id ?? null;
+
+    const desired = [];
+    desired.push(pod2, pod1, pod3);
+    desired.forEach(el => podium.appendChild(el));
+
+    function setPod(slotIndex, ent, avatarElId) {
+        const nameEl = document.getElementById(slotIndex === 1 ? "name1" : slotIndex === 2 ? "name2" : "name3");
+        const amtEl = document.getElementById(slotIndex === 1 ? "amt1" : slotIndex === 2 ? "amt2" : "amt3");
+        const salesEl = document.getElementById(slotIndex === 1 ? "sales1" : slotIndex === 2 ? "sales2" : "sales3");
         const avatarEl = document.getElementById(avatarElId);
 
         if (!nameEl || !amtEl || !salesEl) return;
@@ -105,82 +383,23 @@ function updatePodiumUI() {
             nameEl.textContent = "";
             amtEl.textContent = "";
             salesEl.textContent = "";
+            amtEl.dataset.value = "0";
+            salesEl.dataset.value = "0";
             if (avatarEl) avatarEl.src = blank;
             return;
         }
 
         nameEl.textContent = ent.name;
-        amtEl.textContent = (ent.amount != null && ent.amount > 0) ? fmt(ent.amount) : "";
-        salesEl.textContent = (ent.sales === 1) ? "1 sale" : (ent.sales > 1 ? ent.sales + " Sales" : "");
+
+        const fromAmt = Number(amtEl.dataset.value ?? parseMoneyTextToNumber(amtEl.textContent));
+        const toAmt = Number(ent.amount ?? 0);
+        animateNumber(amtEl, fromAmt, toAmt, v => (v > 0 ? fmt(v) : ""), 700);
+
+        const fromSales = Number(salesEl.dataset.value ?? parseSalesTextToNumber(salesEl.textContent));
+        const toSales = Number(ent.sales ?? 0);
+        animateNumber(salesEl, fromSales, toSales, salesFormat, 600);
+
         if (avatarEl) avatarEl.src = ent.avatar || blank;
     }
 
     setPod(1, top[0], "avatar1");
-    setPod(2, top[1], "avatar2");
-    setPod(3, top[2], "avatar3");
-}
-
-function renderList() {
-    const rows = document.getElementById("rowsContainer");
-    if (!rows) return;
-
-    rows.innerHTML = "";
-    if (Array.isArray(window.agents) && window.agents.length) {
-        window.agents.slice(3).forEach(a => rows.appendChild(makeRow(a)));
-    }
-
-    updatePodiumUI();
-}
-
-async function pollOnce() {
-    try {
-        const url = buildUrlForPeriod();
-        const res = await fetch(url, { cache: "no-store" });
-        if (!res.ok) return;
-
-        const json = await res.json();
-        if (!json || !Array.isArray(json.agents)) return;
-
-        if (json.timestamp && json.timestamp === lastTimestamp) return;
-        lastTimestamp = json.timestamp || new Date().toISOString();
-
-        window.agents = json.agents.map((a, i) => ({
-            rank: a.rank ?? (i + 1),
-            name: a.name ?? "",
-            amount: Number(a.amount ?? 0),
-            sales: a.sales ?? 0,
-            team: a.team ?? "",
-            avatar: a.avatar || ""
-        }));
-
-        renderList();
-    } catch {
-        // ignore
-    }
-}
-
-function setActivePeriodUI(period) {
-    document.querySelectorAll(".btn.gold").forEach(b => b.classList.toggle("active", b.dataset.period === period));
-    document.querySelectorAll(".period-tabs .tab, .tab").forEach(t => t.classList.toggle("active", t.dataset.period === period));
-    const label = period.charAt(0).toUpperCase() + period.slice(1);
-
-    const sub = document.getElementById("period-sub");
-    if (sub) sub.textContent = `${label} sales — updated automatically`;
-
-    lastTimestamp = null;
-}
-
-function switchPeriod(period) {
-    location.hash = period;
-    setActivePeriodUI(period);
-    pollOnce();
-}
-
-document.querySelectorAll(".btn.gold").forEach(b => b.addEventListener("click", () => switchPeriod(b.dataset.period)));
-document.querySelectorAll(".period-tabs .tab, .tab").forEach(t => t.addEventListener("click", () => switchPeriod(t.dataset.period)));
-window.addEventListener("hashchange", () => setActivePeriodUI(getCurrentPeriod()));
-
-renderList();
-setActivePeriodUI(getCurrentPeriod());
-pollOnce();
-setInterval(pollOnce, POLL_MS);

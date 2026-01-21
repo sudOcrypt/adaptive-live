@@ -65,6 +65,12 @@
         </div>
 
         <section class="hero" role="main" aria-label="Live leaderboard hero">
+            <!-- Offline banner (hidden by default; toggled by site.js) -->
+            <div id="offlineBanner" class="offline-banner" role="status" aria-live="polite" hidden>
+                <span class="offline-dot" aria-hidden="true"></span>
+                <span id="offlineText">Last updated — reconnecting…</span>
+            </div>
+
             <div class="hero-head">
                 <div class="hero-title">Adaptive Financial <span style="color:var(--gold-2)">Live Leaderboard</span></div>
                 <div class="hero-sub" id="period-sub">Realtime sales totals — updated automatically</div>
@@ -105,28 +111,47 @@
             </div>
 
             <div class="list-card" style="margin-top:22px">
-                <div class="row header" aria-hidden="true">
+                <div class="row header">
                     <div class="rank">#</div>
                     <div>Agent</div>
-                    <div class="team-col">Team</div>
-                    <div class="amount-list">Amount</div>
-                    <div class="sales-list">Sales</div>
+
+                    <div class="team-col has-tip" tabindex="0" aria-describedby="tip-team">
+                        Team <span class="tip-icon" aria-hidden="true">i</span>
+                        <span id="tip-team" class="tooltip" role="tooltip">Primary Team</span>
+                    </div>
+
+                    <div class="amount-list has-tip" tabindex="0" aria-describedby="tip-amount">
+                        Amount <span class="tip-icon" aria-hidden="true">i</span>
+                        <span id="tip-amount" class="tooltip" role="tooltip">Weekly Premium Written</span>
+                    </div>
+
+                    <div class="sales-list has-tip" tabindex="0" aria-describedby="tip-sales">
+                        Sales <span class="tip-icon" aria-hidden="true">i</span>
+                        <span id="tip-sales" class="tooltip" role="tooltip">Policies Issued</span>
+                    </div>
                 </div>
 
                 <div id="rowsContainer" aria-live="polite"></div>
+
+                <!-- Empty state (hidden by default; toggled by site.js) -->
+                <div id="emptyState" class="empty-state" role="status" aria-live="polite" hidden>
+                    <div class="empty-icon" aria-hidden="true">🏆</div>
+                    <div class="empty-title">No sales yet</div>
+                    <div class="empty-sub">first close claims the crown.</div>
+                </div>
+
                 <div style="text-align:center;margin-top:10px;color:var(--muted);font-size:13px">
-                    
+                    Live data shown. Sub-team badges appear to the right of names.
                 </div>
             </div>
         </section>
     </div>
 
     <footer class="site-footer" role="contentinfo" aria-label="Footer">
-        Live data shown. Developed and maintained by Jared Aigner. Inspired by Tommy Sheridan.
+        Live data shown. Footer is pinned to bottom and will not cover leaderboard content.
     </footer>
 
     <script src="js/site.js" defer></script>
     <script src="js/particles.js" defer></script>
 </body>
-
 </html>
