@@ -758,6 +758,53 @@ button.tab:hover > span {
     font-weight: 900;
     color: rgba(255,255,255,0.78);
     letter-spacing: 0.3px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.rank-number {
+    display: inline-block;
+}
+
+.rank-arrow {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 10px;
+    animation: rankArrowBounce 0.6s ease-out;
+    line-height: 1;
+}
+
+.rank-arrow.up {
+    color: #22c55e;
+    text-shadow: 0 0 12px rgba(34, 197, 94, 0.4);
+}
+
+.rank-arrow.down {
+    color: #ef4444;
+    text-shadow: 0 0 12px rgba(239, 68, 68, 0.4);
+}
+
+@keyframes rankArrowBounce {
+    0% {
+        opacity: 0;
+        transform: scale(0.3) translateY(0);
+    }
+    40% {
+        opacity: 1;
+        transform: scale(1.2) translateY(-3px);
+    }
+    100% {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+@media (prefers-reduced-motion: reduce) {
+    .rank-arrow {
+        animation: none;
+    }
 }
 
 .user {
@@ -1057,7 +1104,7 @@ button.tab:hover > span {
 
 @media (max-width: 480px) {
     :root {
-        --lb-col-rank: 40px;
+        --lb-col-rank: 50px;
         --lb-col-stats: 1fr;
         --lb-gap: 10px;
     }
@@ -1072,6 +1119,13 @@ button.tab:hover > span {
         grid-column: 1;
         grid-row: 1 / span 2;
         align-self: center;
+    }
+    .rank {
+        flex-direction: column;
+        gap: 2px;
+    }
+    .rank-arrow {
+        font-size: 9px;
     }
     .cell-user {
         grid-column: 2;
