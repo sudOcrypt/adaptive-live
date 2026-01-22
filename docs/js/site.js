@@ -297,42 +297,53 @@ function makeRow(a) {
     colRank.className = "rank cell cell-rank";
     colRank.textContent = a.rank ?? "";
 
-    const colAgent = document.createElement("div");
-    colAgent.className = "agent cell cell-agent";
+    // User zone (avatar + name + team)
+    const colUser = document.createElement("div");
+    colUser.className = "cell cell-user user";
 
     const img = document.createElement("img");
     img.src = a.avatar || blank;
     img.alt = a.name || "";
+    img.className = "user-avatar";
 
-    const nmWrap = document.createElement("div");
+    const userText = document.createElement("div");
+    userText.className = "user-text";
+
     const nm = document.createElement("div");
     nm.className = "agent-name";
     nm.textContent = a.name || "";
-    nmWrap.appendChild(nm);
 
-    colAgent.appendChild(img);
-    colAgent.appendChild(nmWrap);
-
-    const colTeam = document.createElement("div");
-    colTeam.className = "team-col cell cell-team";
+    const team = document.createElement("div");
+    team.className = "team-col";
     const teamCode = a.team || lookupTeamByName(a.name) || "";
-    colTeam.textContent = fullTeamName(teamCode);
+    team.textContent = fullTeamName(teamCode);
+
+    userText.appendChild(nm);
+    userText.appendChild(team);
+
+    colUser.appendChild(img);
+    colUser.appendChild(userText);
+
+    // Stats zone (amount + sales)
+    const colStats = document.createElement("div");
+    colStats.className = "cell cell-stats stats";
 
     const colAmt = document.createElement("div");
-    colAmt.className = "amount-list cell cell-amount";
+    colAmt.className = "amount-list stat amount";
     colAmt.textContent = (a.amount != null && a.amount > 0) ? fmt(a.amount) : "";
     colAmt.dataset.value = String(a.amount ?? 0);
 
     const colSales = document.createElement("div");
-    colSales.className = "sales-list cell cell-sales";
+    colSales.className = "sales-list stat sales";
     colSales.textContent = (a.sales === 1) ? "1 sale" : (a.sales > 1 ? a.sales + " Sales" : "");
     colSales.dataset.value = String(a.sales ?? 0);
 
+    colStats.appendChild(colAmt);
+    colStats.appendChild(colSales);
+
     row.appendChild(colRank);
-    row.appendChild(colAgent);
-    row.appendChild(colTeam);
-    row.appendChild(colAmt);
-    row.appendChild(colSales);
+    row.appendChild(colUser);
+    row.appendChild(colStats);
 
     return row;
 }
@@ -346,7 +357,7 @@ function updateRowInPlace(row, a) {
     const rankEl = row.querySelector(".rank");
     if (rankEl) rankEl.textContent = a.rank ?? "";
 
-    const img = row.querySelector(".agent img");
+    const img = row.querySelector(".user-avatar");
     if (img) {
         const next = a.avatar || blank;
         if (img.src !== next) img.src = next;
