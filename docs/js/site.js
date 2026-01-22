@@ -285,7 +285,19 @@ function makeRow(a) {
 
     const colRank = document.createElement("div");
     colRank.className = "rank cell cell-rank";
-    colRank.textContent = a.rank ?? "";
+
+    const rankNumber = document.createElement("span");
+    rankNumber.className = "rank-number";
+    rankNumber.textContent = a.rank ?? "";
+    colRank.appendChild(rankNumber);
+
+    const prevRank = previousRankings.get(a.id);
+    if (prevRank != null && prevRank !== a.rank) {
+        const arrow = document.createElement("span");
+        arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
+        arrow.textContent = prevRank > a.rank ? "▲" : "▼";
+        colRank.appendChild(arrow);
+    }
 
     const colUser = document.createElement("div");
     colUser.className = "cell cell-user user";
@@ -343,7 +355,31 @@ function updateRowInPlace(row, a) {
     row.dataset.name = a.name || "";
 
     const rankEl = row.querySelector(".rank");
-    if (rankEl) rankEl.textContent = a.rank ?? "";
+    if (rankEl) {
+        let rankNumber = rankEl.querySelector(".rank-number");
+        if (!rankNumber) {
+            rankNumber = document.createElement("span");
+            rankNumber.className = "rank-number";
+            rankEl.appendChild(rankNumber);
+        }
+        rankNumber.textContent = a.rank ?? "";
+
+        let arrow = rankEl.querySelector(".rank-arrow");
+        const prevRank = previousRankings.get(a.id);
+
+        if (prevRank != null && prevRank !== a.rank) {
+            if (!arrow) {
+                arrow = document.createElement("span");
+                arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
+                rankEl.appendChild(arrow);
+            } else {
+                arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
+            }
+            arrow.textContent = prevRank > a.rank ? "▲" : "▼";
+        } else if (arrow) {
+            arrow.remove();
+        }
+    }
 
     const img = row.querySelector(".user-avatar");
     if (img) {
@@ -377,6 +413,7 @@ function updateRowInPlace(row, a) {
 }
 
 let lastTop1Id = null;
+let previousRankings = new Map();
 
 function updatePodiumWithFLIP(agents) {
     const podium = document.querySelector(".podium");
@@ -480,6 +517,10 @@ function applyAgentsAnimated(nextAgents) {
     window.agents = nextAgents;
     updatePodiumWithFLIP(window.agents);
     updateListWithFLIP(window.agents);
+
+    nextAgents.forEach(agent => {
+        previousRankings.set(agent.id, agent.rank);
+    });
 }
 
 async function fetchJson(url) {
