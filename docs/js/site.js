@@ -7,9 +7,7 @@ window.knownAgents = window.knownAgents || [];
 const SUPABASE_FUNCTION_BASE =
     "https://bxnnluhfvqtycaptwjdc.supabase.co/functions/v1/leaderboard";
 
-// Static fallback for GitHub Pages (served from /docs/data/)
 function staticJsonUrlForPeriod(period) {
-    // cache-bust so Pages/CDN doesn’t serve stale JSON during testing
     const v = Math.floor(Date.now() / 15000);
     return `data/leaderboard-${encodeURIComponent(period)}.json?v=${v}`;
 }
@@ -28,8 +26,7 @@ function getCurrentPeriod() {
 }
 
 function buildSupabaseUrlForPeriod(period) {
-    // Cache-bust for browsers/CDNs
-    const cacheKey = Math.floor(Date.now() / 15000); // changes ~every 15s
+    const cacheKey = Math.floor(Date.now() / 15000);
     return `${SUPABASE_FUNCTION_BASE}?period=${encodeURIComponent(period)}&v=${cacheKey}`;
 }
 
@@ -52,7 +49,6 @@ function lookupTeamByName(name) {
     return found ? found.team : "";
 }
 
-/* ---------- Optional UI state helpers (safe: no-op if markup not present) ---------- */
 let lastSuccessfulFetchAt = null;
 let offlineTimer = 0;
 
@@ -115,7 +111,6 @@ function clearTotalsUI(period) {
     updateTotals(period, []);
 }
 
-/* ---------- Stable IDs ---------- */
 function stableIdFromAgent(a) {
     if (a && (a.id != null && String(a.id).trim() !== "")) return String(a.id);
     const name = (a?.name || "").trim().toLowerCase();
@@ -123,7 +118,6 @@ function stableIdFromAgent(a) {
     return `name:${name}|team:${team}`;
 }
 
-/* ---------- Counting animations ---------- */
 function easeOutCubic(t) { return 1 - Math.pow(1 - t, 3); }
 
 function animateNumber(el, from, to, format, durationMs = 650) {
@@ -177,7 +171,6 @@ function salesFormat(v) {
     return n === 1 ? "1 sale" : `${n} Sales`;
 }
 
-/* ---------- Totals (Total AP + Total Sales) ---------- */
 function totalsPeriodLabel(period) {
     if (period === "daily") return "today";
     if (period === "weekly") return "this week";
@@ -211,7 +204,6 @@ function updateTotals(period, agents) {
     }
 }
 
-/* ---------- FLIP helpers ---------- */
 function measureRects(mapIdToEl) {
     const rects = new Map();
     for (const [id, el] of mapIdToEl) {
@@ -239,7 +231,7 @@ function playFLIP(beforeRects, mapIdToEl, options = {}) {
         el.style.transition = "transform 0s";
         el.style.willChange = "transform";
 
-        el.getBoundingClientRect(); // force reflow
+        el.getBoundingClientRect();
 
         el.style.transition = `transform ${duration}ms ${easing}`;
         el.style.transform = "";
@@ -253,7 +245,6 @@ function playFLIP(beforeRects, mapIdToEl, options = {}) {
     }
 }
 
-/* ---------- Podium crown bounce ---------- */
 function ensureCrownEl() {
     const pill = document.querySelector("#pod-1 .pill.gold");
     if (!pill) return null;
@@ -286,7 +277,6 @@ function crownBounce() {
     );
 }
 
-/* ---------- DOM builders ---------- */
 function makeRow(a) {
     const row = document.createElement("div");
     row.className = "row";
@@ -297,7 +287,6 @@ function makeRow(a) {
     colRank.className = "rank cell cell-rank";
     colRank.textContent = a.rank ?? "";
 
-    // User zone (avatar + name + team)
     const colUser = document.createElement("div");
     colUser.className = "cell cell-user user";
 
@@ -324,7 +313,6 @@ function makeRow(a) {
     colUser.appendChild(img);
     colUser.appendChild(userText);
 
-    // Stats zone (amount + sales)
     const colStats = document.createElement("div");
     colStats.className = "cell cell-stats stats";
 
@@ -388,7 +376,6 @@ function updateRowInPlace(row, a) {
     }
 }
 
-/* ---------- Podium updates + FLIP reorder ---------- */
 let lastTop1Id = null;
 
 function updatePodiumWithFLIP(agents) {
@@ -410,7 +397,6 @@ function updatePodiumWithFLIP(agents) {
     const top = (agents || []).slice(0, 3);
     const firstId = top[0]?.id ?? null;
 
-    // Keep original DOM order for desktop grid (2,1,3)
     [pod2, pod1, pod3].forEach(el => podium.appendChild(el));
 
     function setPod(slotIndex, ent, avatarElId) {
@@ -455,7 +441,6 @@ function updatePodiumWithFLIP(agents) {
     playFLIP(before, podMap, { duration: 420 });
 }
 
-/* ---------- List updates + FLIP reorder ---------- */
 function updateListWithFLIP(agents) {
     const rowsContainer = document.getElementById("rowsContainer");
     if (!rowsContainer) return;
@@ -491,14 +476,12 @@ function updateListWithFLIP(agents) {
     playFLIP(before, afterMap, { duration: 440 });
 }
 
-/* ---------- Primary render pipeline ---------- */
 function applyAgentsAnimated(nextAgents) {
     window.agents = nextAgents;
     updatePodiumWithFLIP(window.agents);
     updateListWithFLIP(window.agents);
 }
 
-/* ---------- Fetching ---------- */
 async function fetchJson(url) {
     const res = await fetch(url, { cache: "no-store" });
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
@@ -509,7 +492,6 @@ async function pollOnce() {
     const period = getCurrentPeriod();
 
     try {
-        // 1) Try Supabase function
         const url = buildSupabaseUrlForPeriod(period);
         const json = await fetchJson(url);
 
@@ -518,7 +500,6 @@ async function pollOnce() {
         lastSuccessfulFetchAt = Date.now();
         clearOfflineState();
 
-        // Empty state
         if (json.agents.length === 0) {
             setEmptyStateVisible(true);
             clearPodiumUI();
@@ -546,7 +527,6 @@ async function pollOnce() {
         updateTotals(period, next);
         return;
     } catch {
-        // Supabase failed. Fall back to static JSON (GitHub Pages-friendly).
         showOfflineState();
     }
 
@@ -556,8 +536,6 @@ async function pollOnce() {
 
         if (!json || !Array.isArray(json.agents)) return;
 
-        // NOTE: This is still considered "success" for display purposes
-        // (but we keep the offline banner visible since Supabase is down).
         if (json.agents.length === 0) {
             setEmptyStateVisible(true);
             clearPodiumUI();
@@ -568,7 +546,6 @@ async function pollOnce() {
         }
         setEmptyStateVisible(false);
 
-        // For static JSON, use timestamp if present, else always render
         const ts = json.timestamp || null;
         if (ts && ts === lastTimestamp) return;
         lastTimestamp = ts || new Date().toISOString();
@@ -586,11 +563,9 @@ async function pollOnce() {
         applyAgentsAnimated(next);
         updateTotals(period, next);
     } catch {
-        // Both failed: keep last known data visible; do nothing else.
     }
 }
 
-/* ---------- Period switching UI ---------- */
 function setActivePeriodUI(period) {
     document.querySelectorAll(".btn.gold").forEach(b => b.classList.toggle("active", b.dataset.period === period));
     document.querySelectorAll(".period-tabs .tab, .tab").forEach(t => t.classList.toggle("active", t.dataset.period === period));
@@ -599,10 +574,8 @@ function setActivePeriodUI(period) {
     const sub = document.getElementById("period-sub");
     if (sub) sub.textContent = `${label} sales — updated automatically`;
 
-    // Ensure totals subtitles update immediately on period switch (even before fetch completes)
     updateTotals(period, window.agents || []);
 
-    // Allow fetch even if timestamp same across periods
     lastTimestamp = null;
 }
 
@@ -626,7 +599,6 @@ function wireUi() {
     });
 }
 
-/* ---------- Init ---------- */
 wireUi();
 setActivePeriodUI(getCurrentPeriod());
 pollOnce();
