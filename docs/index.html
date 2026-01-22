@@ -76,8 +76,6 @@
                 <div class="hero-sub" id="period-sub">Realtime sales totals — updated automatically</div>
             </div>
 
-            <!-- Removed ONLY the period toggle buttons that were directly above the podium section -->
-
             <div class="podium" aria-label="Top three agents">
                 <div class="pod left" id="pod-2">
                     <div class="pill silver">2nd</div>
@@ -103,6 +101,21 @@
                     <div class="name" id="name3"></div>
                     <div class="amount" id="amt3"></div>
                     <div class="sales" id="sales3"></div>
+                </div>
+            </div>
+
+            <!-- Totals strip (centered, non-overlapping) -->
+            <div class="totals-strip" aria-label="Totals">
+                <div class="total-card" aria-label="Total AP">
+                    <div class="total-label">Total AP</div>
+                    <div id="totalApValue" class="total-value money" data-value="0">$0</div>
+                    <div id="totalApSub" class="total-sub">for today</div>
+                </div>
+
+                <div class="total-card" aria-label="Total Sales">
+                    <div class="total-label">Total Sales</div>
+                    <div id="totalSalesValue" class="total-value" data-value="0">0</div>
+                    <div id="totalSalesSub" class="total-sub">for today</div>
                 </div>
             </div>
 
