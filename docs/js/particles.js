@@ -98,7 +98,7 @@
         podRectDirty = false;
     }
 
-    // Mark rect dirty on things that can move layout (but don’t read rect immediately)
+    // Mark rect dirty on things that can move layout (but don't read rect immediately)
     window.addEventListener("scroll", () => { podRectDirty = true; }, { passive: true });
 
     // Periodic rect refresh (cheap) so sparkles stay attached even without scroll/resize events
