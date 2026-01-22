@@ -100,50 +100,17 @@ html, body {
     height: calc(100% + 16px);
     pointer-events: none;
     z-index: 3;
-
-    /* KEY FIX: allow glow to extend without a square clip */
-    overflow: visible;
-
-    /* Slightly soften the whole SVG render (avoid harsh edge cutoff) */
-    filter: drop-shadow(0 10px 34px rgba(242,180,80,0.16)) drop-shadow(0 0 26px rgba(242,201,107,0.10));
-}
-
-/* Soft halo behind the ring so the glow falloff isn't constrained to the SVG box */
-.topbar-ring::before {
-    content: "";
-    position: absolute;
-    inset: -26px;
-    border-radius: 18px;
-    pointer-events: none;
-    z-index: -1;
-    background: radial-gradient(closest-side at 50% 50%,
-        rgba(242,201,107,0.18) 0%,
-        rgba(242,201,107,0.08) 35%,
-        rgba(242,201,107,0.02) 62%,
-        rgba(242,201,107,0.00) 78%);
-    filter: blur(18px);
-    opacity: 0.9;
-}
-
-/* soften glow rectangle for depth */
-.topbar-ring rect.glow {
-    stroke: rgba(242,201,107,0.035);
-    stroke-width: 8;
-    fill: none;
-    filter: blur(10px);
+    filter: drop-shadow(0 10px 28px rgba(242,180,80,0.14)); /* softened */
 }
 
     .topbar-ring path.base {
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-width: 3.25;
+        stroke-width: 3.5;
         fill: none;
         stroke: url(#topbarGrad);
         stroke-opacity: 1;
-
-        /* Softer, less “hard neon” */
-        filter: blur(1.2px) drop-shadow(0 8px 26px rgba(242,180,80,0.10)) drop-shadow(0 0 18px rgba(242,201,107,0.09));
-
+        filter: blur(0.6px) drop-shadow(0 6px 20px rgba(242,180,80,0.09)); /* softened */
         /* dash pattern: short visible head + long gap to create a single moving laser head */
         stroke-dasharray: 300 2200;
         stroke-dashoffset: 0;
@@ -154,17 +121,22 @@ html, body {
     .topbar-ring path.head {
         stroke-linecap: round;
         stroke-linejoin: round;
-        stroke-width: 9;
+        stroke-width: 8;
         fill: none;
         stroke: url(#laserHead);
         stroke-opacity: 0.95;
-
-        /* More blur, more falloff, less clipping feel */
-        filter: blur(6px) drop-shadow(0 14px 40px rgba(242,180,80,0.22)) drop-shadow(0 0 26px rgba(242,201,107,0.12));
-
+        filter: blur(4px) drop-shadow(0 12px 30px rgba(242,180,80,0.22));
         stroke-dasharray: 300 2200;
         stroke-dashoffset: 0;
         animation: laser-move 6.5s linear infinite;
+    }
+
+    /* faint soft outline for depth */
+    .topbar-ring rect.glow {
+        stroke: rgba(242,201,107,0.04);
+        stroke-width: 6;
+        fill: none;
+        filter: blur(8px);
     }
 
 @keyframes laser-move {
@@ -400,9 +372,10 @@ button.tab:hover > span {
     text-shadow: 0 5px 22px rgba(242,185,80,0.05);
 }
 
+/* Move the period subtitle up slightly so it doesn't crowd the podium/crown */
 .hero-sub {
-    margin-top: 6px;
-    color: var(--muted);
+    margin-top: 2px;      /* was 6px */
+    line-height: 1.75;    /* tighter line box */
 }
 
 /* Period tabs */
@@ -614,6 +587,56 @@ button.tab:hover > span {
     font-size: 13px;
     position: relative;
     z-index: 2;
+}
+
+/* Totals strip (Total AP + Total Sales) */
+.totals-strip {
+    margin-top: 18px;
+    margin-bottom: 18px;
+    display: flex;
+    justify-content: center;
+    gap: 14px;
+    flex-wrap: wrap;
+    position: relative;
+    z-index: 2; /* above particles */
+}
+
+.total-card {
+    min-width: 260px;
+    max-width: 520px;
+    flex: 1 1 260px;
+    padding: 14px 16px;
+    border-radius: 12px;
+    text-align: center;
+    background: linear-gradient(180deg, rgba(255,255,255,0.01), rgba(0,0,0,0.20));
+    border: 1px solid rgba(255,255,255,0.03);
+    box-shadow: 0 14px 46px rgba(0,0,0,0.55), 0 0 22px rgba(242,201,107,0.06);
+}
+
+.total-label {
+    font-size: 12px;
+    font-weight: 900;
+    letter-spacing: 2px;
+    text-transform: uppercase;
+    color: rgba(255,255,255,0.55);
+}
+
+.total-value {
+    margin-top: 6px;
+    font-size: 30px;
+    font-weight: 950;
+    color: rgba(243, 214, 140, 0.98);
+    font-variant-numeric: tabular-nums;
+    font-feature-settings: "tnum" 1;
+    letter-spacing: 0.2px;
+    text-shadow: 0 8px 30px rgba(242,201,107,0.08);
+}
+
+.total-sub {
+    margin-top: 6px;
+    font-size: 12px;
+    color: var(--muted);
+    font-weight: 650;
 }
 
 /* List */
