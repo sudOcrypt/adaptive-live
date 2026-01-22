@@ -111,6 +111,10 @@ function clearPodiumUI() {
     });
 }
 
+function clearTotalsUI(period) {
+    updateTotals(period, []);
+}
+
 /* ---------- Stable IDs ---------- */
 function stableIdFromAgent(a) {
     if (a && (a.id != null && String(a.id).trim() !== "")) return String(a.id);
@@ -171,6 +175,40 @@ function salesFormat(v) {
     const n = Math.round(Number(v) || 0);
     if (n <= 0) return "";
     return n === 1 ? "1 sale" : `${n} Sales`;
+}
+
+/* ---------- Totals (Total AP + Total Sales) ---------- */
+function totalsPeriodLabel(period) {
+    if (period === "daily") return "today";
+    if (period === "weekly") return "this week";
+    if (period === "monthly") return "this month";
+    return "this period";
+}
+
+function updateTotals(period, agents) {
+    const apEl = document.getElementById("totalApValue");
+    const salesEl = document.getElementById("totalSalesValue");
+    const apSub = document.getElementById("totalApSub");
+    const salesSub = document.getElementById("totalSalesSub");
+
+    const label = totalsPeriodLabel(period);
+    if (apSub) apSub.textContent = `for ${label}`;
+    if (salesSub) salesSub.textContent = `for ${label}`;
+
+    const totalAp = (agents || []).reduce((sum, a) => sum + Number(a.amount ?? 0), 0);
+    const totalSales = (agents || []).reduce((sum, a) => sum + Number(a.sales ?? 0), 0);
+
+    if (apEl) {
+        const fromAp = Number(apEl.dataset.value ?? parseMoneyTextToNumber(apEl.textContent));
+        const toAp = Number(totalAp || 0);
+        animateNumber(apEl, fromAp, toAp, v => fmt(v), 850);
+    }
+
+    if (salesEl) {
+        const fromSales = Number(salesEl.dataset.value ?? parseSalesTextToNumber(salesEl.textContent));
+        const toSales = Number(totalSales || 0);
+        animateNumber(salesEl, fromSales, toSales, v => String(Math.round(Number(v) || 0)), 750);
+    }
 }
 
 /* ---------- FLIP helpers ---------- */
@@ -473,6 +511,7 @@ async function pollOnce() {
         if (json.agents.length === 0) {
             setEmptyStateVisible(true);
             clearPodiumUI();
+            clearTotalsUI(period);
             const rows = document.getElementById("rowsContainer");
             if (rows) rows.replaceChildren();
             return;
@@ -493,6 +532,7 @@ async function pollOnce() {
         }));
 
         applyAgentsAnimated(next);
+        updateTotals(period, next);
         return;
     } catch {
         // Supabase failed. Fall back to static JSON (GitHub Pages-friendly).
@@ -510,6 +550,7 @@ async function pollOnce() {
         if (json.agents.length === 0) {
             setEmptyStateVisible(true);
             clearPodiumUI();
+            clearTotalsUI(period);
             const rows = document.getElementById("rowsContainer");
             if (rows) rows.replaceChildren();
             return;
@@ -532,6 +573,7 @@ async function pollOnce() {
         }));
 
         applyAgentsAnimated(next);
+        updateTotals(period, next);
     } catch {
         // Both failed: keep last known data visible; do nothing else.
     }
@@ -545,6 +587,9 @@ function setActivePeriodUI(period) {
     const label = period.charAt(0).toUpperCase() + period.slice(1);
     const sub = document.getElementById("period-sub");
     if (sub) sub.textContent = `${label} sales — updated automatically`;
+
+    // Ensure totals subtitles update immediately on period switch (even before fetch completes)
+    updateTotals(period, window.agents || []);
 
     // Allow fetch even if timestamp same across periods
     lastTimestamp = null;
