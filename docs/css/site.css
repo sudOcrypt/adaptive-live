@@ -59,7 +59,7 @@ body::after {
     position: fixed;
     inset: 0;
     pointer-events: none;
-    background: url("assets/adaptive_logo.png") no-repeat center center;
+    background: url("/adaptive-live/assets/adaptive_logo.png") no-repeat center center;
     background-size: 800px;
     opacity: 0.05;
     filter: saturate(0.9) brightness(1.05);
