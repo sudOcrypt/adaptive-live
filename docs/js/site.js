@@ -295,12 +295,15 @@ function makeRow(a) {
     const currentDailyRank = period === 'daily' ? a.rank : currentDailyRankings.get(a.id);
     const prevRank = previousDailyRankings.get(a.id);
 
+    console.log(`[Arrow Render] ${a.name}: prevRank=${prevRank}, currentDailyRank=${currentDailyRank}, period=${period}`);
+
     if (prevRank != null && currentDailyRank != null && prevRank !== currentDailyRank) {
         const arrow = document.createElement("span");
         const diff = Math.abs(prevRank - currentDailyRank);
         arrow.className = prevRank > currentDailyRank ? "rank-arrow up" : "rank-arrow down";
         arrow.textContent = prevRank > currentDailyRank ? `▲${diff}` : `▼${diff}`;
         colRank.appendChild(arrow);
+        console.log(`[Arrow Render] ${a.name}: SHOWING ARROW ${arrow.textContent}`);
     }
 
     const colUser = document.createElement("div");
@@ -423,6 +426,42 @@ let lastTop1Id = null;
 let previousDailyRankings = new Map();
 let currentDailyRankings = new Map();
 
+function loadRankingsFromStorage() {
+    try {
+        const stored = localStorage.getItem('dailyRankings');
+        if (stored) {
+            const data = JSON.parse(stored);
+            if (data.current) {
+                currentDailyRankings = new Map(Object.entries(data.current));
+            }
+            if (data.previous) {
+                previousDailyRankings = new Map(Object.entries(data.previous));
+            }
+            console.log('[Storage] Loaded rankings from localStorage:', {
+                current: currentDailyRankings.size,
+                previous: previousDailyRankings.size
+            });
+        }
+    } catch (e) {
+        console.error('[Storage] Failed to load rankings:', e);
+    }
+}
+
+function saveRankingsToStorage() {
+    try {
+        const data = {
+            current: Object.fromEntries(currentDailyRankings),
+            previous: Object.fromEntries(previousDailyRankings)
+        };
+        localStorage.setItem('dailyRankings', JSON.stringify(data));
+        console.log('[Storage] Saved rankings to localStorage');
+    } catch (e) {
+        console.error('[Storage] Failed to save rankings:', e);
+    }
+}
+
+loadRankingsFromStorage();
+
 function updatePodiumWithFLIP(agents) {
     const podium = document.querySelector(".podium");
     if (!podium) return;
@@ -530,9 +569,13 @@ function applyAgentsAnimated(nextAgents) {
             const currentRank = currentDailyRankings.get(agent.id);
             if (currentRank != null) {
                 previousDailyRankings.set(agent.id, currentRank);
+                console.log(`[Arrow Debug] ${agent.name}: prev=${currentRank} -> current=${agent.rank}`);
+            } else {
+                console.log(`[Arrow Debug] ${agent.name}: First time seen, rank=${agent.rank}`);
             }
             currentDailyRankings.set(agent.id, agent.rank);
         });
+        saveRankingsToStorage();
     }
 
     updatePodiumWithFLIP(window.agents);
@@ -561,9 +604,13 @@ async function fetchDailyRankingsForArrows() {
             const currentRank = currentDailyRankings.get(agent.id);
             if (currentRank != null) {
                 previousDailyRankings.set(agent.id, currentRank);
+                console.log(`[Arrow Fetch] ${agent.id}: prev=${currentRank} -> current=${agent.rank}`);
+            } else {
+                console.log(`[Arrow Fetch] ${agent.id}: First time seen, rank=${agent.rank}`);
             }
             currentDailyRankings.set(agent.id, agent.rank);
         });
+        saveRankingsToStorage();
     } catch {
     }
 }
@@ -572,7 +619,7 @@ async function pollOnce() {
     const period = getCurrentPeriod();
 
     if (period !== 'daily') {
-        fetchDailyRankingsForArrows();
+        await fetchDailyRankingsForArrows();
     }
 
     try {
