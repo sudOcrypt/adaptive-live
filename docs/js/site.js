@@ -523,20 +523,20 @@ function updateListWithFLIP(agents) {
 
 function applyAgentsAnimated(nextAgents) {
     window.agents = nextAgents;
-    updatePodiumWithFLIP(window.agents);
-    updateListWithFLIP(window.agents);
 
     const period = getCurrentPeriod();
     if (period === 'daily') {
         nextAgents.forEach(agent => {
+            const currentRank = currentDailyRankings.get(agent.id);
+            if (currentRank != null) {
+                previousDailyRankings.set(agent.id, currentRank);
+            }
             currentDailyRankings.set(agent.id, agent.rank);
         });
-        setTimeout(() => {
-            nextAgents.forEach(agent => {
-                previousDailyRankings.set(agent.id, agent.rank);
-            });
-        }, 1000);
     }
+
+    updatePodiumWithFLIP(window.agents);
+    updateListWithFLIP(window.agents);
 }
 
 async function fetchJson(url) {
@@ -558,14 +558,12 @@ async function fetchDailyRankingsForArrows() {
         }));
 
         dailyAgents.forEach(agent => {
+            const currentRank = currentDailyRankings.get(agent.id);
+            if (currentRank != null) {
+                previousDailyRankings.set(agent.id, currentRank);
+            }
             currentDailyRankings.set(agent.id, agent.rank);
         });
-
-        setTimeout(() => {
-            dailyAgents.forEach(agent => {
-                previousDailyRankings.set(agent.id, agent.rank);
-            });
-        }, 1000);
     } catch {
     }
 }
