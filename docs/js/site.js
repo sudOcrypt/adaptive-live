@@ -620,6 +620,7 @@ function setActivePeriodUI(period) {
     updateTotals(period, window.agents || []);
 
     lastTimestamp = null;
+    previousRankings.clear();
 }
 
 function switchPeriod(period) {
