@@ -294,8 +294,9 @@ function makeRow(a) {
     const prevRank = previousRankings.get(a.id);
     if (prevRank != null && prevRank !== a.rank) {
         const arrow = document.createElement("span");
+        const diff = Math.abs(prevRank - a.rank);
         arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
-        arrow.textContent = prevRank > a.rank ? "▲" : "▼";
+        arrow.textContent = prevRank > a.rank ? `▲${diff}` : `▼${diff}`;
         colRank.appendChild(arrow);
     }
 
@@ -368,6 +369,7 @@ function updateRowInPlace(row, a) {
         const prevRank = previousRankings.get(a.id);
 
         if (prevRank != null && prevRank !== a.rank) {
+            const diff = Math.abs(prevRank - a.rank);
             if (!arrow) {
                 arrow = document.createElement("span");
                 arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
@@ -375,7 +377,7 @@ function updateRowInPlace(row, a) {
             } else {
                 arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
             }
-            arrow.textContent = prevRank > a.rank ? "▲" : "▼";
+            arrow.textContent = prevRank > a.rank ? `▲${diff}` : `▼${diff}`;
         } else if (arrow) {
             arrow.remove();
         }
