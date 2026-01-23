@@ -291,12 +291,15 @@ function makeRow(a) {
     rankNumber.textContent = a.rank ?? "";
     colRank.appendChild(rankNumber);
 
+    const period = getCurrentPeriod();
+    const currentDailyRank = period === 'daily' ? a.rank : currentDailyRankings.get(a.id);
     const prevRank = previousDailyRankings.get(a.id);
-    if (prevRank != null && prevRank !== a.rank) {
+
+    if (prevRank != null && currentDailyRank != null && prevRank !== currentDailyRank) {
         const arrow = document.createElement("span");
-        const diff = Math.abs(prevRank - a.rank);
-        arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
-        arrow.textContent = prevRank > a.rank ? `▲${diff}` : `▼${diff}`;
+        const diff = Math.abs(prevRank - currentDailyRank);
+        arrow.className = prevRank > currentDailyRank ? "rank-arrow up" : "rank-arrow down";
+        arrow.textContent = prevRank > currentDailyRank ? `▲${diff}` : `▼${diff}`;
         colRank.appendChild(arrow);
     }
 
@@ -366,18 +369,20 @@ function updateRowInPlace(row, a) {
         rankNumber.textContent = a.rank ?? "";
 
         let arrow = rankEl.querySelector(".rank-arrow");
+        const period = getCurrentPeriod();
+        const currentDailyRank = period === 'daily' ? a.rank : currentDailyRankings.get(a.id);
         const prevRank = previousDailyRankings.get(a.id);
 
-        if (prevRank != null && prevRank !== a.rank) {
-            const diff = Math.abs(prevRank - a.rank);
+        if (prevRank != null && currentDailyRank != null && prevRank !== currentDailyRank) {
+            const diff = Math.abs(prevRank - currentDailyRank);
             if (!arrow) {
                 arrow = document.createElement("span");
-                arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
+                arrow.className = prevRank > currentDailyRank ? "rank-arrow up" : "rank-arrow down";
                 rankEl.appendChild(arrow);
             } else {
-                arrow.className = prevRank > a.rank ? "rank-arrow up" : "rank-arrow down";
+                arrow.className = prevRank > currentDailyRank ? "rank-arrow up" : "rank-arrow down";
             }
-            arrow.textContent = prevRank > a.rank ? `▲${diff}` : `▼${diff}`;
+            arrow.textContent = prevRank > currentDailyRank ? `▲${diff}` : `▼${diff}`;
         } else if (arrow) {
             arrow.remove();
         }
@@ -416,6 +421,7 @@ function updateRowInPlace(row, a) {
 
 let lastTop1Id = null;
 let previousDailyRankings = new Map();
+let currentDailyRankings = new Map();
 
 function updatePodiumWithFLIP(agents) {
     const podium = document.querySelector(".podium");
@@ -523,8 +529,13 @@ function applyAgentsAnimated(nextAgents) {
     const period = getCurrentPeriod();
     if (period === 'daily') {
         nextAgents.forEach(agent => {
-            previousDailyRankings.set(agent.id, agent.rank);
+            currentDailyRankings.set(agent.id, agent.rank);
         });
+        setTimeout(() => {
+            nextAgents.forEach(agent => {
+                previousDailyRankings.set(agent.id, agent.rank);
+            });
+        }, 1000);
     }
 }
 
@@ -534,8 +545,37 @@ async function fetchJson(url) {
     return await res.json();
 }
 
+async function fetchDailyRankingsForArrows() {
+    try {
+        const url = buildSupabaseUrlForPeriod('daily');
+        const json = await fetchJson(url);
+
+        if (!json || !Array.isArray(json.agents)) return;
+
+        const dailyAgents = json.agents.map((a, i) => ({
+            id: stableIdFromAgent(a),
+            rank: a.rank ?? (i + 1),
+        }));
+
+        dailyAgents.forEach(agent => {
+            currentDailyRankings.set(agent.id, agent.rank);
+        });
+
+        setTimeout(() => {
+            dailyAgents.forEach(agent => {
+                previousDailyRankings.set(agent.id, agent.rank);
+            });
+        }, 1000);
+    } catch {
+    }
+}
+
 async function pollOnce() {
     const period = getCurrentPeriod();
+
+    if (period !== 'daily') {
+        fetchDailyRankingsForArrows();
+    }
 
     try {
         const url = buildSupabaseUrlForPeriod(period);
