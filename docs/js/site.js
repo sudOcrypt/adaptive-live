@@ -291,7 +291,7 @@ function makeRow(a) {
     rankNumber.textContent = a.rank ?? "";
     colRank.appendChild(rankNumber);
 
-    const prevRank = previousRankings.get(a.id);
+    const prevRank = previousDailyRankings.get(a.id);
     if (prevRank != null && prevRank !== a.rank) {
         const arrow = document.createElement("span");
         const diff = Math.abs(prevRank - a.rank);
@@ -366,7 +366,7 @@ function updateRowInPlace(row, a) {
         rankNumber.textContent = a.rank ?? "";
 
         let arrow = rankEl.querySelector(".rank-arrow");
-        const prevRank = previousRankings.get(a.id);
+        const prevRank = previousDailyRankings.get(a.id);
 
         if (prevRank != null && prevRank !== a.rank) {
             const diff = Math.abs(prevRank - a.rank);
@@ -415,7 +415,7 @@ function updateRowInPlace(row, a) {
 }
 
 let lastTop1Id = null;
-let previousRankings = new Map();
+let previousDailyRankings = new Map();
 
 function updatePodiumWithFLIP(agents) {
     const podium = document.querySelector(".podium");
@@ -520,9 +520,12 @@ function applyAgentsAnimated(nextAgents) {
     updatePodiumWithFLIP(window.agents);
     updateListWithFLIP(window.agents);
 
-    nextAgents.forEach(agent => {
-        previousRankings.set(agent.id, agent.rank);
-    });
+    const period = getCurrentPeriod();
+    if (period === 'daily') {
+        nextAgents.forEach(agent => {
+            previousDailyRankings.set(agent.id, agent.rank);
+        });
+    }
 }
 
 async function fetchJson(url) {
@@ -620,7 +623,6 @@ function setActivePeriodUI(period) {
     updateTotals(period, window.agents || []);
 
     lastTimestamp = null;
-    previousRankings.clear();
 }
 
 function switchPeriod(period) {
