@@ -325,16 +325,8 @@ function makeRow(a) {
     const colUser = document.createElement("div");
     colUser.className = "cell cell-user user";
 
-    const teamCode = (a.team || lookupTeamByName(a.name) || "").toLowerCase();
-    if (teamCode) {
-        const teamDot = document.createElement("span");
-        teamDot.className = `team-dot team-${teamCode}`;
-        teamDot.setAttribute("aria-hidden", "true");
-        colUser.appendChild(teamDot);
-    }
-
     const img = document.createElement("img");
-    img.src = a.avatar || a.avatar_url || blank;
+    img.src = a.avatar || blank;
     img.alt = a.name || "";
     img.className = "user-avatar";
 
@@ -359,29 +351,18 @@ function makeRow(a) {
     const colStats = document.createElement("div");
     colStats.className = "cell cell-stats stats";
 
-    const statsInner = document.createElement("div");
-    statsInner.className = "stats-inner";
-
     const colAmt = document.createElement("div");
     colAmt.className = "amount-list stat amount";
     colAmt.textContent = (a.amount != null && a.amount > 0) ? fmt(a.amount) : "";
     colAmt.dataset.value = String(a.amount ?? 0);
-
-    const maxAmt = (window.agents && window.agents[0]) ? window.agents[0].amount : (a.amount || 1);
-    const pct = maxAmt > 0 ? Math.min(100, (Number(a.amount ?? 0) / maxAmt) * 100) : 0;
-    const progressBar = document.createElement("div");
-    progressBar.className = "amount-progress";
-    progressBar.innerHTML = `<div class="amount-progress-fill" style="width:${pct}%"></div>`;
 
     const colSales = document.createElement("div");
     colSales.className = "sales-list stat sales";
     colSales.textContent = (a.sales === 1) ? "1 sale" : (a.sales > 1 ? a.sales + " Sales" : "");
     colSales.dataset.value = String(a.sales ?? 0);
 
-    statsInner.appendChild(colAmt);
-    statsInner.appendChild(progressBar);
-    statsInner.appendChild(colSales);
-    colStats.appendChild(statsInner);
+    colStats.appendChild(colAmt);
+    colStats.appendChild(colSales);
 
     row.appendChild(colRank);
     row.appendChild(colUser);
@@ -424,27 +405,6 @@ function updateRowInPlace(row, a) {
         } else if (arrow) {
             arrow.remove();
         }
-    }
-
-    const maxAmt = (window.agents && window.agents[0]) ? window.agents[0].amount : (a.amount || 1);
-    const pct = maxAmt > 0 ? Math.min(100, (Number(a.amount ?? 0) / maxAmt) * 100) : 0;
-    const progressFill = row.querySelector(".amount-progress-fill");
-    if (progressFill) progressFill.style.width = `${pct}%`;
-
-    let teamDot = row.querySelector(".team-dot");
-    const teamCode = (a.team || lookupTeamByName(a.name) || "").toLowerCase();
-    if (teamCode) {
-        if (!teamDot) {
-            teamDot = document.createElement("span");
-            teamDot.className = `team-dot team-${teamCode}`;
-            teamDot.setAttribute("aria-hidden", "true");
-            const colUser = row.querySelector(".cell-user");
-            if (colUser) colUser.insertBefore(teamDot, colUser.firstChild);
-        } else {
-            teamDot.className = `team-dot team-${teamCode}`;
-        }
-    } else if (teamDot) {
-        teamDot.remove();
     }
 
     const img = row.querySelector(".user-avatar");
@@ -686,7 +646,6 @@ async function pollOnce() {
 
         lastSuccessfulFetchAt = Date.now();
         clearOfflineState();
-        updateLastUpdatedBadge();
 
         if (json.agents.length === 0) {
             setEmptyStateVisible(true);
@@ -737,22 +696,15 @@ async function pollOnce() {
     }
 }
 
-function updateLastUpdatedBadge() {
-    const el = document.getElementById("lastUpdatedText");
-    if (!el) return;
-    el.textContent = `Updated ${minsAgoText(lastSuccessfulFetchAt)}`;
-}
-
 function setActivePeriodUI(period) {
     document.querySelectorAll(".btn.gold").forEach(b => b.classList.toggle("active", b.dataset.period === period));
     document.querySelectorAll(".period-tabs .tab, .tab").forEach(t => t.classList.toggle("active", t.dataset.period === period));
 
     const label = period.charAt(0).toUpperCase() + period.slice(1);
     const sub = document.getElementById("period-sub");
-    if (sub) sub.textContent = `${label} sales`;
+    if (sub) sub.textContent = `${label} sales — updated automatically`;
 
     updateTotals(period, window.agents || []);
-    updateLastUpdatedBadge();
 
     lastTimestamp = null;
 }
@@ -781,4 +733,3 @@ wireUi();
 setActivePeriodUI(getCurrentPeriod());
 pollOnce();
 setInterval(pollOnce, POLL_MS);
-setInterval(updateLastUpdatedBadge, 15000);
