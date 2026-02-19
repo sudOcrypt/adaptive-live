@@ -41,7 +41,7 @@ function mapApiAgentsToDisplay(agents) {
             amount,
             sales: Number(a.sales ?? 0),
             team: a.team ?? "",
-            avatar: a.avatar || ""
+            avatar: a.avatar || a.avatar_url || ""
         };
     });
 }
