@@ -72,7 +72,13 @@
         <section class="hero" role="main" aria-label="Live leaderboard hero">
             <div class="hero-head">
                 <div class="hero-title">Adaptive Financial <span style="color:var(--gold-2)">Live Leaderboard</span></div>
-                <div class="hero-sub" id="period-sub">Realtime sales totals — updated automatically</div>
+                <div class="hero-sub-wrap">
+                    <div id="period-sub" class="hero-sub"></div>
+                    <div class="live-badge" id="liveBadge" aria-label="Live data">
+                        <span class="live-dot"></span>
+                        <span id="lastUpdatedText">Updated just now</span>
+                    </div>
+                </div>
             </div>
 
             <div class="podium" aria-label="Top three agents">
@@ -126,14 +132,16 @@
                     </div>
 
                     <div class="cell cell-stats stats">
-                        <div class="amount-list has-tip stat amount" tabindex="0" aria-describedby="tip-amount">
-                            Amount <span class="tip-icon" aria-hidden="true">i</span>
-                            <span id="tip-amount" class="tooltip" role="tooltip">Weekly Premium Written</span>
-                        </div>
-
-                        <div class="sales-list has-tip stat sales" tabindex="0" aria-describedby="tip-sales">
-                            Sales <span class="tip-icon" aria-hidden="true">i</span>
-                            <span id="tip-sales" class="tooltip" role="tooltip">Policies Issued</span>
+                        <div class="stats-inner header-stats">
+                            <div class="amount-list has-tip stat amount" tabindex="0" aria-describedby="tip-amount">
+                                Amount <span class="tip-icon" aria-hidden="true">i</span>
+                                <span id="tip-amount" class="tooltip" role="tooltip">Weekly Premium Written</span>
+                            </div>
+                            <div class="amount-progress header-progress" aria-hidden="true"></div>
+                            <div class="sales-list has-tip stat sales" tabindex="0" aria-describedby="tip-sales">
+                                Sales <span class="tip-icon" aria-hidden="true">i</span>
+                                <span id="tip-sales" class="tooltip" role="tooltip">Policies Issued</span>
+                            </div>
                         </div>
                     </div>
                 </div>
