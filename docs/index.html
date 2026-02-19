@@ -7,11 +7,11 @@
     <title>Adaptive Financial — Live Leaderboard</title>
     <link rel="stylesheet" href="css/site.css">
 </head>
-<body>
+<body class="preload">
     <canvas id="particles" aria-hidden="true"></canvas>
 
     <div class="wrap">
-        <div class="topbar" role="banner" aria-label="Top bar">
+        <div class="topbar animate-on-load" role="banner" aria-label="Top bar">
             <svg class="topbar-ring" viewBox="0 0 1200 76" preserveAspectRatio="none" aria-hidden="true">
                 <defs>
                     <!-- Single cohesive gold - solid laser core -->
@@ -66,7 +66,7 @@
             </div>
         </div>
 
-        <section class="hero" role="main" aria-label="Live leaderboard hero">
+        <section class="hero animate-on-load animate-delay-1" role="main" aria-label="Live leaderboard hero">
             <div class="hero-head">
                 <div class="hero-title">Adaptive Financial <span style="color:var(--gold-2)">Live Leaderboard</span></div>
                 <div class="hero-sub" id="period-sub">Realtime sales totals — updated automatically</div>
@@ -76,7 +76,7 @@
                 </div>
             </div>
 
-            <div class="podium" aria-label="Top three agents">
+            <div class="podium animate-on-load animate-delay-2" aria-label="Top three agents">
                 <div class="pod left" id="pod-2">
                     <div class="pill silver">2nd</div>
                     <div class="avatar"><img id="avatar2" src="data:image/gif;base64,R0lGODlhAQABAAD/ACwAAAAAAQABAAACADs=" alt="2nd avatar" /></div>
@@ -104,7 +104,7 @@
                 </div>
             </div>
 
-            <div class="totals-strip" aria-label="Totals">
+            <div class="totals-strip animate-on-load animate-delay-3" aria-label="Totals">
                 <div class="total-card" aria-label="Total AP">
                     <div class="total-label">Total AP</div>
                     <div id="totalApValue" class="total-value money" data-value="0">$0</div>
@@ -118,7 +118,7 @@
                 </div>
             </div>
 
-            <div class="list-card" style="margin-top:32px">
+            <div class="list-card animate-on-load animate-delay-4" style="margin-top:32px">
                 <div class="row header">
                     <div class="rank cell cell-rank">#</div>
 
@@ -152,7 +152,7 @@
         </section>
     </div>
 
-    <footer class="site-footer" role="contentinfo" aria-label="Footer">
+    <footer class="site-footer animate-on-load animate-delay-5" role="contentinfo" aria-label="Footer">
         Live data shown. Designed and created by Jared Aigner. Inspired by Thomas Sheridan.
     </footer>
 

@@ -741,3 +741,34 @@ wireUi();
 setActivePeriodUI(getCurrentPeriod());
 pollOnce();
 setInterval(pollOnce, POLL_MS);
+
+function initPageAnimations() {
+    if (prefersReducedMotion()) return;
+
+    requestAnimationFrame(() => {
+        document.body.classList.remove("preload");
+        document.body.classList.add("loaded");
+    });
+
+    const scrollTargets = document.querySelectorAll("[data-animate-scroll]");
+    if (scrollTargets.length === 0) return;
+
+    const observer = new IntersectionObserver(
+        (entries) => {
+            entries.forEach((entry) => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add("in-view");
+                }
+            });
+        },
+        { threshold: 0.15, rootMargin: "0px 0px -40px 0px" }
+    );
+
+    scrollTargets.forEach((el) => observer.observe(el));
+}
+
+if (document.readyState === "loading") {
+    document.addEventListener("DOMContentLoaded", initPageAnimations);
+} else {
+    initPageAnimations();
+}
