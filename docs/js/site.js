@@ -30,6 +30,22 @@ function buildSupabaseUrlForPeriod(period) {
     return `${SUPABASE_FUNCTION_BASE}?period=${encodeURIComponent(period)}&v=${cacheKey}`;
 }
 
+function mapApiAgentsToDisplay(agents) {
+    if (!agents || !Array.isArray(agents)) return [];
+    return agents.map((a, i) => {
+        const amount = Number(a.amount ?? a.points ?? 0);
+        return {
+            id: stableIdFromAgent(a),
+            rank: a.rank ?? (i + 1),
+            name: a.name ?? "",
+            amount,
+            sales: Number(a.sales ?? 0),
+            team: a.team ?? "",
+            avatar: a.avatar || ""
+        };
+    });
+}
+
 function fullTeamName(code) {
     if (!code) return "";
     switch ((code || "").toLowerCase()) {
@@ -644,16 +660,7 @@ async function pollOnce() {
         if (json.timestamp && json.timestamp === lastTimestamp) return;
         lastTimestamp = json.timestamp || new Date().toISOString();
 
-        const next = json.agents.map((a, i) => ({
-            id: stableIdFromAgent(a),
-            rank: a.rank ?? (i + 1),
-            name: a.name ?? "",
-            amount: Number(a.amount ?? 0),
-            sales: Number(a.sales ?? 0),
-            team: a.team ?? "",
-            avatar: a.avatar || ""
-        }));
-
+        const next = mapApiAgentsToDisplay(json.agents);
         applyAgentsAnimated(next);
         updateTotals(period, next);
         return;
@@ -681,15 +688,7 @@ async function pollOnce() {
         if (ts && ts === lastTimestamp) return;
         lastTimestamp = ts || new Date().toISOString();
 
-        const next = json.agents.map((a, i) => ({
-            id: stableIdFromAgent(a),
-            rank: a.rank ?? (i + 1),
-            name: a.name ?? "",
-            amount: Number(a.amount ?? 0),
-            sales: Number(a.sales ?? 0),
-            team: a.team ?? "",
-            avatar: a.avatar || ""
-        }));
+        const next = mapApiAgentsToDisplay(json.agents);
 
         applyAgentsAnimated(next);
         updateTotals(period, next);
