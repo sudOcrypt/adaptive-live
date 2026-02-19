@@ -646,6 +646,8 @@ async function pollOnce() {
 
         lastSuccessfulFetchAt = Date.now();
         clearOfflineState();
+        const liveEl = document.getElementById("lastUpdatedText");
+        if (liveEl) liveEl.textContent = "Updated " + minsAgoText(lastSuccessfulFetchAt);
 
         if (json.agents.length === 0) {
             setEmptyStateVisible(true);
@@ -687,6 +689,9 @@ async function pollOnce() {
         const ts = json.timestamp || null;
         if (ts && ts === lastTimestamp) return;
         lastTimestamp = ts || new Date().toISOString();
+        lastSuccessfulFetchAt = Date.now();
+        const liveEl2 = document.getElementById("lastUpdatedText");
+        if (liveEl2) liveEl2.textContent = "Updated " + minsAgoText(lastSuccessfulFetchAt);
 
         const next = mapApiAgentsToDisplay(json.agents);
 
@@ -703,6 +708,9 @@ function setActivePeriodUI(period) {
     const label = period.charAt(0).toUpperCase() + period.slice(1);
     const sub = document.getElementById("period-sub");
     if (sub) sub.textContent = `${label} sales — updated automatically`;
+
+    const liveEl = document.getElementById("lastUpdatedText");
+    if (liveEl && lastSuccessfulFetchAt) liveEl.textContent = "Updated " + minsAgoText(lastSuccessfulFetchAt);
 
     updateTotals(period, window.agents || []);
 
