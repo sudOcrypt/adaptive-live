@@ -409,7 +409,7 @@ function updateRowInPlace(row, a) {
 
     const img = row.querySelector(".user-avatar");
     if (img) {
-        const next = a.avatar || blank;
+        const next = a.avatar || a.avatar_url || blank;
         if (img.src !== next) img.src = next;
         img.alt = a.name || "";
     }
@@ -527,7 +527,7 @@ function updatePodiumWithFLIP(agents) {
         const toSales = Number(ent.sales ?? 0);
         animateNumber(salesEl, fromSales, toSales, salesFormat, 600);
 
-        if (avatarEl) avatarEl.src = ent.avatar || blank;
+        if (avatarEl) avatarEl.src = ent.avatar || ent.avatar_url || blank;
     }
 
     setPod(1, top[0], "avatar1");
